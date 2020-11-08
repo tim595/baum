@@ -7,6 +7,8 @@ public class Graph {
 
     public Graph(Tree tree) {
         mxGraph graph = new mxGraph();
+        graph.setConnectableEdges(false);
+        graph.setCellsLocked(true);
         graph.getModel().beginUpdate();
         Object parent = graph.getDefaultParent();
 

@@ -39,9 +39,10 @@ public class Gui extends JFrame {
 
         JFrame f = new JFrame();
         JPanel panel = new JPanel();
+        JScrollPane scroller = new JScrollPane(panel);
         panel.add(graphComponent);
 
-        f.getContentPane().add(panel);
+        f.getContentPane().add(scroller);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         f.setBounds(0, 0, screenSize.width-100, screenSize.height-100);
 
@@ -73,30 +74,9 @@ public class Gui extends JFrame {
         tree.addKey(Integer.parseInt(input));
         tree.printTree();
         graphComponent = new Graph(tree).getGraphComponent();
-        // f.getContentPane().findComponentAt(0, 0);
         panel.remove(0);
         panel.add(graphComponent);
         f.revalidate();
         f.repaint();
-        // f.revalidate();
-        // f.repaint();
-        /*
-        new Thread() {
-            @Override public void run () {
-                SwingUtilities.invokeLater(new Runnable(){
-                    @Override public void run() {
-                        f.validate();
-                        f.repaint();
-                    }
-                });
-            }
-        }.start();
-
-         */
-        System.out.println(input);
-        System.out.println("henlo");
-        // f.add(graphComponent);
-
-        // f.repaint();
     }
 }
