@@ -32,7 +32,7 @@ public class Gui extends JFrame {
 
     public static void main(String[] args) {
         Tree tree;
-        tree = new Tree(5);
+        tree = new Tree(3);
 
         Graph graph = new Graph(tree);
         mxGraphComponent graphComponent = graph.getGraphComponent();
@@ -71,12 +71,19 @@ public class Gui extends JFrame {
     }
 
     static private void buttonPressed(Tree tree, String input, JPanel panel, JFrame f, mxGraphComponent graphComponent) {
-        tree.addKey(Integer.parseInt(input));
-        tree.printTree();
-        graphComponent = new Graph(tree).getGraphComponent();
-        panel.remove(0);
-        panel.add(graphComponent);
-        f.revalidate();
-        f.repaint();
+        try {
+            int inputValue = Integer.parseInt(input);
+            if (inputValue >= 0) {
+                tree.addKey(Integer.parseInt(input));
+                tree.printTree();
+                graphComponent = new Graph(tree).getGraphComponent();
+                panel.remove(0);
+                panel.add(graphComponent);
+                f.revalidate();
+                f.repaint();
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Input is not a number");
+        }
     }
 }

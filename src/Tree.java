@@ -5,7 +5,7 @@ public class Tree {
     static int numberOfNodes = 0;
     int m;
     static List<Node> nodeList = new ArrayList<Node>();
-    static Node root;
+    Node root;
     static Node nodePointer;
     static int[] keys = {1, 10, 20, 15, 16, 2, 3, 4, 5, 6, 7, 8, 17, 18, 19};
     static int treeHeight = 1;
@@ -27,34 +27,6 @@ public class Tree {
     int getTreeHeight() {
         return this.getTreeHeight();
     }
-
-    /*
-    public static void main(String[] args) {
-        int[] entryArray = {40, 17, 19, 2, 3, 1, 4, 5};
-
-        root = new Node(m);
-        numberOfNodes++;
-        nodeList.add(root);
-
-        for (int value : entryArray) {
-            System.out.println();
-            System.out.print("Next input: " + value);
-            addKey(value);
-            printTree();
-            System.out.println();
-        }
-
-        // printTree();
-
-        System.out.println(root.keys);
-        System.out.println(root.sons);
-        System.out.println(root.sons.get(0).keys);
-        System.out.println(root.sons.get(1).keys);
-
-
-
-    }*/
-
 
     void addKey(int key) {
         if (root.sons.size() == 0) {
