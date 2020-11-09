@@ -27,16 +27,18 @@ public class Node {
         this.keys = keyList;
     }
 
+    // key wird nur dann eingefügt, wenn dieser nicht bereits vorhanden ist, ansonsten wird insert abgewiesen und false zurückgegeben
     boolean insertKey(int key) {
-        if (keys.size() < m-1) {
-            keys.add(key);
-            Collections.sort(keys);
-            // System.out.println(keys);
-            return true;
+        if (keys.contains(key)) {
+            return false;
         } else {
             keys.add(key);
             Collections.sort(keys);
-            return false;
+            return true;
         }
+    }
+    // gibt true zurück, wenn der Knoten im Overflow ist
+    boolean hasOverflown() {
+        return keys.size() > m - 1;
     }
 }
