@@ -8,6 +8,7 @@ public class Tree {
     Node root;
     static Node nodePointer;
     static int[] keys = {1, 10, 20, 15, 16, 2, 3, 4, 5, 6, 7, 8, 17, 18, 19};
+    // static int[] keys = {5};
     static int treeHeight = 1;
 
     Tree(int m) {
@@ -29,16 +30,22 @@ public class Tree {
     }
 
     void addKey(int key) {
+        // Prüfung, ob der Baum lediglich aus einem einzigen Knoten besteht
         if (root.sons.size() == 0) {
             boolean overflow = !root.insertKey(key);
+            // Wurzel wird gesplittet, falls Anzahl zulässiger Schlüssel pro Knoten überschritten wurde
             if (overflow) {
+
+                // Berechnen des Indexes des mittleren Elements (bei geradem m wird hier das erste Element von der Mitte aus links gewählt)
                 int splitKey = (int)Math.floor((m-1)/2);
 
+                // Der Wurzel werden 2 Söhne hinzugefügt
                 root.sons.add(0, new Node(m));
                 root.sons.add(1, new Node(m));
                 root.sons.get(0).parent = root;
                 root.sons.get(1).parent = root;
 
+                // Den Söhnen werden sämtliche Schlüssel aus der Wurzel (abgesehen vom Split-Schlüssel) hinzugefügt
                 for (int i = 0; i<splitKey; i++) {
                     root.sons.get(0).insertKey(root.keys.get(i));
                 }
@@ -46,16 +53,20 @@ public class Tree {
                     root.sons.get(1).insertKey(root.keys.get(j));
                 }
 
+                // Alle Schlüssel außer dem Split-Schlüssel werden aus der Wurzel entfernt
                 for (int k = 0; k<splitKey; k++) {
                     root.keys.remove(0);
                     root.keys.remove(root.keys.size()-1);
                 }
+                // Bei geradem m wird als Splitkey der Schlüssel links von der Mitte aus gewählt
+                if (m%2 == 0) root.keys.remove(root.keys.size()-1);
                 treeHeight++;
             }
+        // Fall, das bereits mehrere Knoten bestehen
         } else {
+            // nodePointer wird auf root gesetzt und wandert so lange nach unten, bis Knoten ohne Sohn gefunden wird (=Blatt)
             nodePointer = root;
             while (!nodePointer.sons.isEmpty()) {
-                // System.out.println("1");
                 for (int i = 0; i<nodePointer.keys.size(); i++) {
                     if (key < nodePointer.keys.get(i)) {
                         nodePointer = nodePointer.sons.get(i);
@@ -66,23 +77,22 @@ public class Tree {
                     }
                 }
             }
+            // neuer Key wird in Blatt eingefügt, danach Prüfung auf Overflow
             boolean overflow = !nodePointer.insertKey(key);
             if (overflow) {
+                // Bei Overflow wird Knoten gesplittet, der nodePointer auf das parent-Element gesetzt und hier auf erneuten Overflow geprüft
                 while (overflow) {
                     if (nodePointer.parent != null) {
                         int splitKey = (int)Math.floor((m-1)/2);
                         int nodeIndex = nodePointer.parent.sons.indexOf(nodePointer);
                         List<Integer> keysLeft = new ArrayList<Integer>();
                         List<Integer> keysRight = new ArrayList<Integer>();
-                        System.out.println("INDEX: " + nodeIndex);
 
                         for (int i = 0; i<splitKey; i++) {
                             keysLeft.add(nodePointer.keys.get(i));
                             keysRight.add(0, nodePointer.keys.get(nodePointer.keys.size()-1-i));
                         }
-
-                        // System.out.println(keysLeft);
-                        // System.out.println(keysRight);
+                        if (m%2 == 0) keysRight.add(0, nodePointer.keys.get(splitKey+1));
 
                         nodePointer.parent.sons.add(nodeIndex, new Node(m, keysLeft));
                         nodePointer.parent.sons.get(nodeIndex).parent = nodePointer.parent;
@@ -99,26 +109,11 @@ public class Tree {
                                 nodePointer.sons.get(i).parent = nodePointer.parent.sons.get(nodeIndex+1);
                             }
                         }
-
-
-
                         nodePointer.parent.sons.remove(nodePointer);
-
-                        // nodePointer = nodePointer.parent;
                         overflow = !nodePointer.parent.insertKey(nodePointer.keys.get(splitKey));
                         nodePointer = nodePointer.parent;
-                        // System.out.println(overflow);
-
-
-                        // nodePointer.parent.keys.add(nodePointer.keys.get(splitKey)); // TODO hier dann auf neuen overflow prüfen
-
-                        // System.out.println("test");
-                        // System.out.println(root.keys);
-                        // System.out.println(root.sons);
                     } else {
                         int splitKey = (int)Math.floor((m-1)/2);
-
-                        // int nodeIndex = nodePointer.parent.sons.indexOf(nodePointer);
                         List<Integer> keysLeft = new ArrayList<Integer>();
                         List<Integer> keysRight = new ArrayList<Integer>();
 
@@ -126,6 +121,7 @@ public class Tree {
                             keysLeft.add(nodePointer.keys.get(i));
                             keysRight.add(0, nodePointer.keys.get(nodePointer.keys.size()-1-i));
                         }
+                        if (m%2 == 0) keysRight.add(0, nodePointer.keys.get(splitKey+1));
 
                         root = new Node(m, nodePointer.keys.get(splitKey));
 
@@ -151,28 +147,10 @@ public class Tree {
                         overflow = false;
                     }
                 }
-
-                /*
-                nodePointer.sons.add(0, new Node(m));
-                nodePointer.sons.add(1, new Node(m));
-
-                for (int i = 0; i<splitKey; i++) {
-                    nodePointer.sons.get(0).insertKey(nodePointer.keys.get(i));
-                }
-                for (int j = m-1; j>splitKey; j--) {
-                    nodePointer.sons.get(1).insertKey(nodePointer.keys.get(j));
-                }
-
-                for (int k = 0; k<splitKey; k++) {
-                    nodePointer.keys.remove(0);
-                    nodePointer.keys.remove(nodePointer.keys.size()-1);
-                }
-
-                 */
             }
-            // System.out.println("asdf" + nodePointer.keys);
         }
     }
+
     public void printTree() {
         System.out.println("HEIGHT: " + treeHeight);
         System.out.println("\t\t");

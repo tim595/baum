@@ -14,25 +14,10 @@ import com.mxgraph.view.mxGraph;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import jdk.swing.interop.SwingInterOpUtils;
 
-public class Gui extends JFrame {
-
-    public Gui(Tree tree) {
-        // getContentPane().add(graphComponent);
-
-        // getContentPane().add(b);//adding button in JFrame
-        // getContentPane().add(input);
-
-
-        int nodeWidth = 25*2*tree.m-1;
-        int nodeHeight = 50;
-    }
-
-
-
-
+public class Gui {
     public static void main(String[] args) {
         Tree tree;
-        tree = new Tree(3);
+        tree = new Tree(6);
 
         Graph graph = new Graph(tree);
         mxGraphComponent graphComponent = graph.getGraphComponent();
