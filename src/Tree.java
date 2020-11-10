@@ -7,176 +7,133 @@ public class Tree {
     static List<Node> nodeList = new ArrayList<Node>();
     Node root;
     static Node nodePointer;
-    static int[] keys = {1, 10, 20, 15, 16, 2, 3, 4, 5, 6, 7, 8, 17, 18, 19};
+    // static int[] keys = {1, 10, 20, 15, 16, 2, 3, 4, 5, 6, 7, 8, 17, 18, 19};
     // static int[] keys = {5};
     static int treeHeight = 1;
+    int minimumKeys, maximumKeys;
 
     Tree(int m) {
         this.m = m;
         root = new Node(m);
-        if (keys != null) {
-            for (int key : keys) {
-                System.out.println("KEY");
-                System.out.println(key);
-                addKey(key);
-                printTree();
-            }
-        }
+        if (m%2 == 0) minimumKeys = (int)Math.floor((m-1)/2);
+        else minimumKeys = (m-1)/2;
+        maximumKeys = m-1;
     }
 
     Node getRoot() {
         return this.root;
     }
 
-    int getTreeHeight() {
-        return this.getTreeHeight();
-    }
-
     void addKey(int key) {
-        // Prüfung, ob der Baum lediglich aus einem einzigen Knoten besteht
-        if (root.sons.size() == 0) {
-            boolean wasInsertSuccessful = root.insertKey(key);
-            if (wasInsertSuccessful) {
-                boolean overflow = root.hasOverflown();
-                // Wurzel wird gesplittet, falls Anzahl zulässiger Schlüssel pro Knoten überschritten wurde
-                if (overflow) {
-                    // Berechnen des Indexes des mittleren Elements (bei geradem m wird hier das erste Element von der Mitte aus links gewählt)
+        if (root.sons.size() == 0) {   // Prüfung, ob der Baum lediglich aus einem einzigen Knoten besteht
+            nodePointer = root;
+            if (!nodePointer.keys.contains(key)) {   // Neuer Key wird eingefügt, sofern er nicht bereits vorhanden ist
+                nodePointer.insertKey(key);
+                boolean overflow = nodePointer.hasOverflown();
+
+                if (overflow) {   // Wurzel wird gesplittet, falls Anzahl zulässiger Schlüssel pro Knoten überschritten wurde
                     int splitKey = (int)Math.floor((m-1)/2);
-
-                    // Der Wurzel werden 2 Söhne hinzugefügt
-                    root.sons.add(0, new Node(m));
-                    root.sons.add(1, new Node(m));
-                    root.sons.get(0).parent = root;
-                    root.sons.get(1).parent = root;
-
-                    // Den Söhnen werden sämtliche Schlüssel aus der Wurzel (abgesehen vom Split-Schlüssel) hinzugefügt
-                    for (int i = 0; i<splitKey; i++) {
-                        root.sons.get(0).insertKey(root.keys.get(i));
-                    }
-                    for (int j = m-1; j>splitKey; j--) {
-                        root.sons.get(1).insertKey(root.keys.get(j));
-                    }
-
-                    // Alle Schlüssel außer dem Split-Schlüssel werden aus der Wurzel entfernt
-                    for (int k = 0; k<splitKey; k++) {
-                        root.keys.remove(0);
-                        root.keys.remove(root.keys.size()-1);
-                    }
-                    // Bei geradem m wird als Splitkey der Schlüssel links von der Mitte aus gewählt
-                    if (m%2 == 0) root.keys.remove(root.keys.size()-1);
+                    root = InsertMethods.splitRoot(nodePointer, splitKey, m);
                     treeHeight++;
                 }
             }
+        } else {   // Fall, dass bereits mehrere Knoten bestehen
+            nodePointer = InsertMethods.searchNodeForInsert(root, key);   // Von der Wurzel aus wird nach unten gewandert, um Einfüge-Position zu suchen
 
-        // Fall, dass bereits mehrere Knoten bestehen
-        } else {
-            // nodePointer wird auf root gesetzt und wandert so lange nach unten, bis Knoten ohne Sohn gefunden wird (=Blatt)
-            nodePointer = root;
-            nodePointer = search(nodePointer, key);
-
-            // neuer Key wird in Blatt eingefügt, danach Prüfung auf Overflow
-            boolean wasInsertSuccessful;
-            if (nodePointer != null) wasInsertSuccessful = nodePointer.insertKey(key);
-            else wasInsertSuccessful = false;
-
-            if (wasInsertSuccessful) {
+            if (nodePointer != null) {
+                nodePointer.insertKey(key);
                 boolean overflow = nodePointer.hasOverflown();
-                if (overflow) {
-                    // Bei Overflow wird Knoten gesplittet, der nodePointer auf das parent-Element gesetzt und hier auf erneuten Overflow geprüft
-                    while (overflow) {
-                        if (nodePointer.parent != null) {
-                            int splitKey = (int)Math.floor((m-1)/2);
-                            int nodeIndex = nodePointer.parent.sons.indexOf(nodePointer);
-                            List<Integer> keysLeft = new ArrayList<Integer>();
-                            List<Integer> keysRight = new ArrayList<Integer>();
-
-                            for (int i = 0; i<splitKey; i++) {
-                                keysLeft.add(nodePointer.keys.get(i));
-                                keysRight.add(0, nodePointer.keys.get(nodePointer.keys.size()-1-i));
-                            }
-                            if (m%2 == 0) keysRight.add(0, nodePointer.keys.get(splitKey+1));
-
-                            nodePointer.parent.sons.add(nodeIndex, new Node(m, keysLeft));
-                            nodePointer.parent.sons.get(nodeIndex).parent = nodePointer.parent;
-                            nodePointer.parent.sons.add(nodeIndex+1, new Node(m, keysRight));
-                            nodePointer.parent.sons.get(nodeIndex+1).parent = nodePointer.parent;
-
-                            if (nodePointer.sons.size() != 0) {
-                                for (int i = 0; i<=splitKey; i++) {
-                                    nodePointer.parent.sons.get(nodeIndex).sons.add(nodePointer.sons.get(i));
-                                    nodePointer.sons.get(i).parent = nodePointer.parent.sons.get(nodeIndex);
-                                }
-                                for (int i = nodePointer.sons.size()-1; i>splitKey; i--) {
-                                    nodePointer.parent.sons.get(nodeIndex+1).sons.add(0, nodePointer.sons.get(i));
-                                    nodePointer.sons.get(i).parent = nodePointer.parent.sons.get(nodeIndex+1);
-                                }
-                            }
-                            nodePointer.parent.sons.remove(nodePointer);
-                            nodePointer.parent.insertKey(nodePointer.keys.get(splitKey));
-                            overflow = nodePointer.parent.hasOverflown();
-                            nodePointer = nodePointer.parent;
-                        } else {
-                            int splitKey = (int)Math.floor((m-1)/2);
-                            List<Integer> keysLeft = new ArrayList<Integer>();
-                            List<Integer> keysRight = new ArrayList<Integer>();
-
-                            for (int i = 0; i<splitKey; i++) {
-                                keysLeft.add(nodePointer.keys.get(i));
-                                keysRight.add(0, nodePointer.keys.get(nodePointer.keys.size()-1-i));
-                            }
-                            if (m%2 == 0) keysRight.add(0, nodePointer.keys.get(splitKey+1));
-
-                            root = new Node(m, nodePointer.keys.get(splitKey));
-
-                            root.sons.add(0, new Node(m, keysLeft));
-                            root.sons.add(1, new Node(m, keysRight));
-                            root.sons.get(0).parent = root;
-                            root.sons.get(1).parent = root;
-
-                            for (int i = 0; i<nodePointer.sons.size(); i++) {
-                                if (i <= splitKey) {
-                                    nodePointer.sons.get(i).parent = root.sons.get(0);
-                                } else {
-                                    nodePointer.sons.get(i).parent = root.sons.get(1);
-                                }
-                            }
-                            for (int i = 0; i<=splitKey; i++) {
-                                root.sons.get(0).sons.add(nodePointer.sons.get(i));
-                            }
-                            for (int i = nodePointer.sons.size()-1; i>splitKey; i--) {
-                                root.sons.get(1).sons.add(0, nodePointer.sons.get(i));
-                            }
-                            treeHeight++;
-                            overflow = false;
-                        }
+                // Bei Overflow wird Knoten gesplittet, der nodePointer auf das parent-Element gesetzt und hier auf erneuten Overflow geprüft
+                while (overflow) {
+                    if (nodePointer.parent != null) {   // Nicht-wurzel-Split
+                        nodePointer = InsertMethods.splitNonRoot(nodePointer, m);  // Knoten wird gesplittet, anschließend wird nodePointer auf dessen parent gesetzt
+                        overflow = nodePointer.hasOverflown();
+                    } else {   // Wurzel-Split
+                        int splitKey = (int)Math.floor((m-1)/2);
+                        root = InsertMethods.splitRoot(nodePointer, splitKey, m);
+                        InsertMethods.updateChildParentRelations(nodePointer, root, splitKey);
+                        treeHeight++;
+                        overflow = false;
                     }
                 }
             }
         }
     }
 
-    //
-    private Node search(Node nodePointer, int key) {
-        System.out.println(nodePointer);
-        if (nodePointer.keys.contains(key)) return null;
-        else {
-            while (!nodePointer.sons.isEmpty()) {
-                for (int i = 0; i<nodePointer.keys.size(); i++) {
-                    if (key < nodePointer.keys.get(i)) {
-                        nodePointer = nodePointer.sons.get(i);
-                        if (nodePointer.keys.contains(key)) return null;
-                        break;
-                    } else if (key > nodePointer.keys.get(i) && i == nodePointer.keys.size()-1) {
-                        nodePointer = nodePointer.sons.get(i+1);
-                        if (nodePointer.keys.contains(key)) return null;
-                        break;
+    void delete(int key) {
+        if (root.sons.size() == 0) {  // Löschen aus Wurzel (wenn diese noch keine Söhne besitzt
+            if (root.keys.contains(key)) {
+                root.removeKey(key);
+            }
+        } else {
+            nodePointer = DeleteMethods.searchNodeForDelete(root, key);
+            if (nodePointer != null) {
+                if (nodePointer.sons.size() == 0) { // Löschen aus Blatt
+                    nodePointer.removeKey(key);
+                } else {  // Löschen aus innerem Knoten
+                    // Suche nach nächstgrößerem Element (vom zu löschenden Key aus betrachtet)
+                    int keyIndex = nodePointer.keys.indexOf(key);
+                    Node nodeToSwapKey = nodePointer.sons.get(keyIndex+1);
+                    while (nodeToSwapKey.sons.size() > 0) {
+                        nodeToSwapKey = nodeToSwapKey.sons.get(0);
                     }
+                    nodePointer.keys.remove(keyIndex);
+                    nodePointer.keys.add(keyIndex, nodeToSwapKey.keys.get(0));
+                    nodeToSwapKey.keys.remove(0);
+                    nodePointer = nodeToSwapKey;
+                }
+
+                boolean underflow = nodePointer.hasUnderflown();
+                System.out.println(underflow);
+                while (underflow) {
+                    if (nodePointer.parent != null) {
+                        boolean canBalance = false;
+                        int nodePointerIndex = nodePointer.parent.sons.indexOf(nodePointer);
+                        Node neighbor;
+                        if (nodePointerIndex != 0) {  // Prüfung, ob linker Nachbar vorhanden ist und dieser Keys abgeben kann
+                            neighbor = nodePointer.parent.sons.get(nodePointerIndex-1);
+                            if (neighbor.keys.size() > minimumKeys) {
+                                canBalance = true;
+
+                                nodePointer.keys.add(0, nodePointer.parent.keys.get(nodePointerIndex-1));   // Parent gibt Key an Underflow-Node ab
+                                nodePointer.parent.keys.add(nodePointerIndex-1, neighbor.keys.get(neighbor.keys.size()-1));  // linker Nachbar gibt größten Key an Parent ab
+                                neighbor.keys.remove(neighbor.keys.size()-1);   // größter Key aus linkem Nachbar wird entfernt
+
+                                if (nodePointer.sons.size() != 0) {  // falls die Knoten Söhne haben, wird der nun überschüssige Knoten vom Nachbar an den ursprünglichen Underflow-Knoten gehängt
+                                    nodePointer.sons.add(0, neighbor.sons.get(neighbor.sons.size()-1));
+                                    neighbor.sons.remove(neighbor.sons.size()-1);
+                                    nodePointer.sons.get(0).parent = nodePointer;
+                                }
+
+                            }
+                        } else if (nodePointerIndex != nodePointer.parent.sons.size()-1) {  // Prüfung, ob rechter Nachbar vorhanden ist und dieser Keys abgeben kann
+                            neighbor = nodePointer.parent.sons.get(nodePointerIndex+1);
+                            if (neighbor.keys.size() > minimumKeys) {
+                                canBalance = true;
+
+                                nodePointer.keys.add(nodePointer.parent.keys.get(nodePointerIndex));  // Parent gibt Key an Underflow-Node ab
+                                nodePointer.parent.keys.add(nodePointerIndex, neighbor.keys.get(0));   // rechter Nachbar gibt kleinsten Key an Parent ab
+                                neighbor.keys.remove(0);  // kleinster Key aus rechtem Nachbar wird entfernt
+
+                                if (nodePointer.sons.size() != 0) {   // Umhängen des Sohns
+                                    nodePointer.sons.add(neighbor.sons.get(0));
+                                    neighbor.sons.remove(0);
+                                    nodePointer.sons.get(nodePointer.sons.size()-1).parent = nodePointer;
+                                }
+                            }
+                        }
+
+                        if (!canBalance) {
+                            // MERGE
+                        }
+
+                        nodePointer = nodePointer.parent;
+                        underflow = nodePointer.hasUnderflown();
+                    }
+
                 }
             }
-            System.out.println("NODEPOINTER1");
-            System.out.println(nodePointer.keys);
-            if (nodePointer.keys.contains(key)) return null;
-            else return nodePointer;
+
         }
     }
 

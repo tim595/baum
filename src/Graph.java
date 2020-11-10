@@ -19,11 +19,6 @@ public class Graph {
                 if (i != tree.getRoot().keys.size()-1) rootValues += "   ";
             }
             Object root = graph.insertVertex(parent, null, rootValues, 0, 0, 120, 30);
-            // Object son = graph.insertVertex(parent, null, "SON", 0, 0, 80, 30);
-            // Object son2 = graph.insertVertex(parent, null, "SON", 0, 0, 80, 30);
-
-            // graph.insertEdge(parent, null, "", root, son);
-            // graph.insertEdge(parent, null, "", root, son2);
 
             if (tree.getRoot().sons.size() != 0 ) {
                 displaySons(tree.getRoot(), graph, parent, root);
