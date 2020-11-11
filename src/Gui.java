@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 import com.mxgraph.swing.mxGraphComponent;
 
@@ -35,12 +35,11 @@ public class Gui {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         f.setBounds(0, 0, screenSize.width-100, screenSize.height-100);
 
-        Box box = new Box(0);
-        // box.setBounds(500, 500, 100, 150);
-        JButton b=new JButton("Add");//creating instance of JButton
-        JTextField input = new JTextField("", 10);
-        box.add(input);
-        box.add(b);
+        Box addBox = new Box(0);
+        JButton addButton=new JButton("Add");//creating instance of JButton
+        JTextField addInput = new JTextField("", 10);
+        addBox.add(addInput);
+        addBox.add(addButton);
 
         Box deleteBox = new Box(0);
         JButton deleteButton = new JButton("Delete");
@@ -50,7 +49,7 @@ public class Gui {
 
 
         if (keys.length != 0) {
-            tree.addKey(keys[0]);
+            tree.insert(keys[0]);
             graphComponent = new Graph(tree).getGraphComponent();
             panel.remove(0);
             panel.add(graphComponent);
@@ -59,22 +58,45 @@ public class Gui {
                     keysToInsert.add(keys[i]);
                 }
             }
-            System.out.println(keysToInsert);
         }
 
-        Box box2 = new Box(0);
+        Box addQueueBox = new Box(0);
         JButton nextButton = new JButton("Insert element from queue");
         String queueKeys = "";
         for (int key : keysToInsert) {
             queueKeys += String.valueOf(key + "  ");
         }
-        JTextField queueElements = new JTextField(queueKeys, 10);
+        JTextField queueElements = new JTextField(queueKeys, 30);
         queueElements.setEnabled(false);
         queueElements.setDisabledTextColor(Color.BLACK);
         queueElements.setText(queueKeys);
         queueElements.setCaretPosition(0);
-        box2.add(nextButton);
-        box2.add(queueElements);
+        addQueueBox.add(nextButton);
+        addQueueBox.add(queueElements);
+        addQueueBox.setBorder(new EmptyBorder(0, 30, 0, 0));
+        addBox.add(addQueueBox);
+        addBox.setBorder(new EmptyBorder(0, 0, 20, 0));
+
+
+        Box deleteQueueBox = new Box(0);
+        JButton nextDeleteButton = new JButton("Delete element from queue");
+        String deleteQueueKeys = "";
+        /*
+        for (int key : keysToInsert) {
+            deleteQueueKeys += String.valueOf(key + "  ");
+        }
+        */
+        JTextField deleteQueueElements = new JTextField(deleteQueueKeys, 30);
+        deleteQueueElements.setEnabled(false);
+        deleteQueueElements.setDisabledTextColor(Color.BLACK);
+        deleteQueueElements.setText(deleteQueueKeys);
+        deleteQueueElements.setCaretPosition(0);
+        deleteQueueBox.add(nextDeleteButton);
+        deleteQueueBox.add(deleteQueueElements);
+        deleteQueueBox.setBorder(new EmptyBorder(0, 15, 0, 0));
+        deleteBox.add(deleteQueueBox);
+        deleteBox.setBorder(new EmptyBorder(0, 0, 20, 0));
+
 
         Box box3 = new Box(0);
         JButton pickFileButton = new JButton("Load CSV file");
@@ -92,54 +114,87 @@ public class Gui {
         });
         box3.add(pickFileButton);
 
+        Box searchBox = new Box(0);
+        JButton searchButton = new JButton("Search");
+        JTextField searchInput = new JTextField("", 10);
+        searchBox.add(searchInput);
+        searchBox.add(searchButton);
+
+        Box searchResultBox = new Box(0);
+        String searchResult = "";
+        /*
+        for (int key : keysToInsert) {
+            deleteQueueKeys += String.valueOf(key + "  ");
+        }
+        */
+        JTextField searchResultText = new JTextField(searchResult, 30);
+        searchResultText.setEnabled(false);
+        searchResultText.setDisabledTextColor(Color.BLACK);
+        searchResultText.setText(deleteQueueKeys);
+        searchResultText.setCaretPosition(0);
+        searchResultBox.add(searchResultText);
+        searchResultBox.setBorder(new EmptyBorder(0, 30, 0, 0));
+        searchBox.add(searchResultBox);
+
+
+
+        Box controlBox = new Box(1);
+        controlBox.add(addBox);
+        controlBox.add(deleteBox);
+        controlBox.add(searchBox);
 
         JPanel controlPanel = new JPanel();
-        controlPanel.add(box);
+        controlPanel.add(controlBox);
+        // controlPanel.add(addBox);
+        /*
         controlPanel.add(deleteBox);
         controlPanel.add(box2);
         controlPanel.add(box3);
+        controlPanel.add(searchBox);
+
+         */
         f.add(controlPanel, BorderLayout.PAGE_END);
 
-        b.addActionListener(new ActionListener() {
+        addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String[] inputArray = input.getText().split(",");
+                String[] inputArray = addInput.getText().split(",");
                 // wenn die Warteschlange leer ist, wird Element direkt zu Baum hinzugefügt, ansonsten wird/werden alle eingegebenen Elemente zur Warteschlange hinzugefügt
                 if (keysToInsert.size() == 0) buttonPressed(tree, inputArray[0].trim(), panel, f);
                 else {
                     keysToInsert.add(Integer.valueOf(inputArray[0].trim()));
-                    box2.remove(1);
+                    addQueueBox.remove(1);
                     String queueKeys = "";
                     for (int key : keysToInsert) {
                         queueKeys += String.valueOf(key + "  ");
                     }
-                    JTextField newQueueTextfield = new JTextField(queueKeys, 10);
+                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
                     newQueueTextfield.setEnabled(false);
                     newQueueTextfield.setDisabledTextColor(Color.BLACK);
                     newQueueTextfield.setCaretPosition(0);
-                    box2.add(newQueueTextfield);
-                    box2.revalidate();
-                    box2.repaint();
+                    addQueueBox.add(newQueueTextfield);
+                    addQueueBox.revalidate();
+                    addQueueBox.repaint();
                 }
                 if (inputArray.length > 1) {
                     for (int i = 1; i<inputArray.length; i++) {
                         keysToInsert.add(Integer.valueOf(inputArray[i].trim()));
                     }
-                    box2.remove(1);
+                    addQueueBox.remove(1);
                     String queueKeys = "";
                     for (int key : keysToInsert) {
                         queueKeys += String.valueOf(key + "  ");
                     }
-                    JTextField newQueueTextfield = new JTextField(queueKeys, 10);
+                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
                     newQueueTextfield.setEnabled(false);
                     newQueueTextfield.setDisabledTextColor(Color.BLACK);
                     newQueueTextfield.setCaretPosition(0);
-                    box2.add(newQueueTextfield);
-                    box2.revalidate();
-                    box2.repaint();
+                    addQueueBox.add(newQueueTextfield);
+                    addQueueBox.revalidate();
+                    addQueueBox.repaint();
                 }
                 System.out.println(keysToInsert);
-                input.setText("");
+                addInput.setText("");
             }
         });
 
@@ -172,25 +227,48 @@ public class Gui {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (keysToInsert.size() > 0) {
-                    tree.addKey(keysToInsert.get(0));
+                    tree.insert(keysToInsert.get(0));
                     keysToInsert.remove(0);
                     mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();
                     panel.remove(0);
                     panel.add(graphComponent);
                     f.revalidate();
                     f.repaint();
-                    box2.remove(1);
+                    addQueueBox.remove(1);
                     String queueKeys = "";
                     for (int key : keysToInsert) {
                         queueKeys += String.valueOf(key + "  ");
                     }
-                    JTextField newQueueTextfield = new JTextField(queueKeys, 10);
+                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
                     newQueueTextfield.setEnabled(false);
                     newQueueTextfield.setDisabledTextColor(Color.BLACK);
                     newQueueTextfield.setCaretPosition(0);
-                    box2.add(newQueueTextfield);
-                    box2.revalidate();
-                    box2.repaint();
+                    addQueueBox.add(newQueueTextfield);
+                    addQueueBox.revalidate();
+                    addQueueBox.repaint();
+                }
+            }
+        });
+
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String searchKey = searchInput.getText();
+                Node searchResultNode;
+                if (searchKey != null) {
+                    searchResultNode = search(tree, searchKey.trim(), panel, f);
+                    if (searchResultNode != null) {
+                        searchBox.remove(2);
+                        String cost = "Cost of search: " + String.valueOf(searchResultNode.searchCost);
+                        JTextField costTextField = new JTextField(cost, 30);
+                        costTextField.setEnabled(false);
+                        costTextField.setDisabledTextColor(Color.BLACK);
+                        costTextField.setCaretPosition(0);
+                        costTextField.setBorder(new EmptyBorder(0, 30, 0, 0));
+                        searchBox.add(costTextField);
+                        searchBox.revalidate();
+                        searchBox.repaint();
+                    }
                 }
             }
         });
@@ -225,24 +303,21 @@ public class Gui {
                             for (int key : keysToInsert) {
                                 queueKeys += String.valueOf(key + "  ");
                             }
-                            box2.remove(1);
+                            addQueueBox.remove(1);
                             JTextField newQueueTextfield = new JTextField(queueKeys, 10);
                             newQueueTextfield.setEnabled(false);
                             newQueueTextfield.setDisabledTextColor(Color.BLACK);
                             newQueueTextfield.setCaretPosition(0);
-                            box2.add(newQueueTextfield);
-                            box2.revalidate();
-                            box2.repaint();
+                            addQueueBox.add(newQueueTextfield);
+                            addQueueBox.revalidate();
+                            addQueueBox.repaint();
                         }
                     } catch (FileNotFoundException ex) {
                         ex.printStackTrace();
                     }
-
-                    //This is where a real application would open the file.
                 }
             }
         });
-
         f.setVisible(true);
     }
 
@@ -250,7 +325,7 @@ public class Gui {
         try {
             int inputValue = Integer.parseInt(input);
             if (inputValue >= 0) {
-                tree.addKey(inputValue);
+                tree.insert(inputValue);
                 mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();
                 panel.remove(0);
                 panel.add(graphComponent);
@@ -276,5 +351,19 @@ public class Gui {
         } catch (NumberFormatException e) {
             System.out.println("Input is not a number");
         }
+    }
+
+    static private Node search(Tree tree, String input, JPanel panel, JFrame f) {
+        int inputValue = Integer.parseInt(input);
+        if (inputValue >= 0) {
+            Node node = tree.search(inputValue);
+            mxGraphComponent graphComponent = new Graph(tree, node).getGraphComponent();
+            panel.remove(0);
+            panel.add(graphComponent);
+            f.revalidate();
+            f.repaint();
+
+            return node;
+        } else return null;
     }
 }

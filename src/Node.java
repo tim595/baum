@@ -8,6 +8,7 @@ public class Node {
     Node parent;
 
     int m;
+    int searchCost;
 
     public Node(int m) {
         this.m = m;
