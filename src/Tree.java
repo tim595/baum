@@ -96,6 +96,7 @@ public class Tree {
                                 canBalance = true;
 
                                 nodePointer.keys.add(0, nodePointer.parent.keys.get(nodePointerIndex-1));   // Parent gibt Key an Underflow-Node ab
+                                nodePointer.parent.keys.remove(nodePointerIndex-1);
                                 nodePointer.parent.keys.add(nodePointerIndex-1, neighbor.keys.get(neighbor.keys.size()-1));  // linker Nachbar gibt größten Key an Parent ab
                                 neighbor.keys.remove(neighbor.keys.size()-1);   // größter Key aus linkem Nachbar wird entfernt
 
@@ -104,14 +105,15 @@ public class Tree {
                                     neighbor.sons.remove(neighbor.sons.size()-1);
                                     nodePointer.sons.get(0).parent = nodePointer;
                                 }
-
                             }
                         } else if (nodePointerIndex != nodePointer.parent.sons.size()-1) {  // Prüfung, ob rechter Nachbar vorhanden ist und dieser Keys abgeben kann
+                            System.out.println("BALANCE RIGHT");
                             neighbor = nodePointer.parent.sons.get(nodePointerIndex+1);
                             if (neighbor.keys.size() > minimumKeys) {
                                 canBalance = true;
 
                                 nodePointer.keys.add(nodePointer.parent.keys.get(nodePointerIndex));  // Parent gibt Key an Underflow-Node ab
+                                nodePointer.parent.keys.remove(nodePointerIndex);
                                 nodePointer.parent.keys.add(nodePointerIndex, neighbor.keys.get(0));   // rechter Nachbar gibt kleinsten Key an Parent ab
                                 neighbor.keys.remove(0);  // kleinster Key aus rechtem Nachbar wird entfernt
 
@@ -124,13 +126,62 @@ public class Tree {
                         }
 
                         if (!canBalance) {
-                            // MERGE
+                            System.out.println("MERGE");
+                            if (nodePointerIndex > 0) {
+                                System.out.println("MERGE LEFT");
+                                // MERGE WITH LEFT
+                                neighbor = nodePointer.parent.sons.get(nodePointerIndex-1);
+                                System.out.println(neighbor.keys);
+                                for (int neighborKey : neighbor.keys) {  // Alle Keys vom Nachbar zu Underflow-Knoten hinzufügen
+                                    nodePointer.insertKey(neighborKey);
+                                }
+                                nodePointer.insertKey(nodePointer.parent.keys.get(nodePointerIndex-1));  // Key aus parent in Underflow-Knoten hinzufügen und aus Parent entfernen
+                                nodePointer.parent.keys.remove(nodePointerIndex-1);
+
+                                if (nodePointer.sons.size() != 0) {
+                                    for (int i = neighbor.sons.size(); i>=0; i--) {   // Falls vorhanden, Söhne von Nachbar zu Underflow-Knoten hinzufügen
+                                        nodePointer.sons.add(0, neighbor.sons.get(i));
+                                        neighbor.sons.get(i).parent = nodePointer;
+                                    }
+                                }
+                                nodePointer.parent.sons.remove(nodePointerIndex-1);   // Referenz auf Nachbar von Parent entfernen
+                            } else if (nodePointerIndex < nodePointer.parent.sons.size()-1) {  // Merge mit rechem Nachbar, falls kein linker Nachbar vorhanden ist
+                                neighbor = nodePointer.parent.sons.get(nodePointerIndex+1);
+                                for (int neighborKey : neighbor.keys) {
+                                    nodePointer.insertKey(neighborKey);
+                                }
+                                nodePointer.insertKey(nodePointer.parent.keys.get(nodePointerIndex));
+                                nodePointer.parent.keys.remove(nodePointerIndex);
+
+                                if (nodePointer.sons.size() != 0) {
+                                    for (int i = 0; i<neighbor.sons.size(); i++) {
+                                        nodePointer.sons.add(neighbor.sons.get(i));
+                                        neighbor.sons.get(i).parent = nodePointer;
+                                    }
+                                }
+                                nodePointer.parent.sons.remove(nodePointerIndex+1);
+                            }
                         }
 
-                        nodePointer = nodePointer.parent;
-                        underflow = nodePointer.hasUnderflown();
+                        if (nodePointer.parent != root) {
+                            nodePointer = nodePointer.parent;
+                            underflow = nodePointer.hasUnderflown();
+                        } else {
+                            if (root.keys.size() > 0) underflow = false;
+                            else {
+                                nodePointer.parent = null;
+                                root = nodePointer;
+                                underflow = false;
+                            }
+                        }
+                    } else {
+                        if (root.keys.size() == 0) {
+                            for (Node son : root.sons) {
+                                son.parent = null;
+                            }
+                            underflow = false;
+                        }
                     }
-
                 }
             }
 
