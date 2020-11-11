@@ -15,23 +15,76 @@ public class Gui {
     static int[] keys = {};
     static List<Integer> keysToInsert = new ArrayList<Integer>();
     static List<Integer> keysToDelete = new ArrayList<Integer>();
+    static List<Integer> csvKeys = new ArrayList<Integer>();
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Tree tree;
         tree = new Tree(5);
 
+        JFrame f = new JFrame();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        f.setBounds(0, 0, screenSize.width-100, screenSize.height-100);
+
+        Object[] o = {"Automatic input via csv",
+                "Manual input"};
+        int optionVal = JOptionPane.showOptionDialog(f, "Welcome to the b-tree simulator!\nDo you want to build the tree automatically via a csv file, or do you want to build it manually?", "Welcome", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                o, o[0]);
+        if (optionVal == JOptionPane.YES_OPTION) {
+            final JFileChooser fc = new JFileChooser();
+            fc.setFileFilter(new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return false;
+                }
+
+                @Override
+                public String getDescription() {
+                    return null;
+                }
+            });
+
+            int returnVal = fc.showDialog(f, "Okay");
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                try {
+                    Scanner fileReader = new Scanner(file);
+                    List<String> keys = new ArrayList<>();
+                    String values = "";
+                    while (fileReader.hasNextLine()) {
+                        for (String s : fileReader.nextLine().split(",")) {
+                            keys.add(s);
+                            values += s + " " ;
+                        }
+                    }
+                    Object[] options = {"Yes",
+                            "Cancel"};
+                    int chosenOptionVal = JOptionPane.showOptionDialog(f, "Do you want to add these values?\n" + values, "Please confirm", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            options, options[0]);
+                    if (chosenOptionVal == JOptionPane.YES_OPTION) {
+                        for (String key : keys) {
+                            csvKeys.add(Integer.parseInt(key.trim()));
+                        }
+                    }
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } else if (optionVal == JOptionPane.NO_OPTION) {
+            System.out.println("manual");
+        }
+
         Graph graph = new Graph(tree);
         mxGraphComponent graphComponent = graph.getGraphComponent();
-
-        JFrame f = new JFrame();
         JPanel panel = new JPanel();
         JScrollPane scroller = new JScrollPane(panel);
         panel.add(graphComponent);
 
         f.getContentPane().add(scroller);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        f.setBounds(0, 0, screenSize.width-100, screenSize.height-100);
 
         Box addBox = new Box(0);
         JButton addButton=new JButton("Add");//creating instance of JButton
@@ -100,21 +153,6 @@ public class Gui {
         deleteBox.add(deleteQueueBox);
         deleteBox.setBorder(new EmptyBorder(0, 0, 20, 0));
 
-        Box box3 = new Box(0);
-        JButton pickFileButton = new JButton("Load CSV file");
-        final JFileChooser fc = new JFileChooser();
-        fc.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                return false;
-            }
-
-            @Override
-            public String getDescription() {
-                return null;
-            }
-        });
-        box3.add(pickFileButton);
 
         Box searchBox = new Box(0);
         JButton searchButton = new JButton("Search");
@@ -299,49 +337,6 @@ public class Gui {
             }
         });
 
-        pickFileButton.addActionListener(e -> {
-            int returnVal = fc.showDialog(f, "Okay");
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
-                try {
-                    Scanner fileReader = new Scanner(file);
-                    List<String> keys = new ArrayList<>();
-                    String values = "";
-                    while (fileReader.hasNextLine()) {
-                        for (String s : fileReader.nextLine().split(",")) {
-                            keys.add(s);
-                            values += s + " " ;
-                        }
-                    }
-                    Object[] options = {"Yes",
-                            "Cancel"};
-                    int chosenOptionVal = JOptionPane.showOptionDialog(f, "Do you want to add these values?\n" + values, "Please confirm", JOptionPane.YES_NO_OPTION,
-                            JOptionPane.QUESTION_MESSAGE,
-                            null,
-                            options, options[0]);
-                    if (chosenOptionVal == JOptionPane.YES_OPTION) {
-                        for (String key : keys) {
-                            keysToInsert.add(Integer.parseInt(key.trim()));
-                        }
-                        String newQueueKeys = "";
-                        for (int key : keysToInsert) {
-                            newQueueKeys += String.valueOf(key + "  ");
-                        }
-                        addQueueBox.remove(1);
-                        JTextField newQueueTextfield = new JTextField(newQueueKeys, 10);
-                        newQueueTextfield.setEnabled(false);
-                        newQueueTextfield.setDisabledTextColor(Color.BLACK);
-                        newQueueTextfield.setCaretPosition(0);
-                        addQueueBox.add(newQueueTextfield);
-                        addQueueBox.revalidate();
-                        addQueueBox.repaint();
-                    }
-                } catch (FileNotFoundException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-
         JTextField randomMin = new JTextField(5);
         JTextField randomMax = new JTextField(5);
         JTextField numOfElements = new JTextField(5);
@@ -361,11 +356,27 @@ public class Gui {
                     "Cancel"};
             int result = JOptionPane.showConfirmDialog(f, randomizePanel, "Add random elements", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                addRandomKeys(randomMin.getText(), randomMax.getText(), numOfElements.getText(), tree, panel, f, addQueueBox);
+                if (randomMin.getText() != null && randomMax.getText() != null && numOfElements.getText() != null) {
+                    addRandomKeys(randomMin.getText(), randomMax.getText(), numOfElements.getText(), tree, panel, f, addQueueBox);
+                }
             }
         });
 
         f.setVisible(true);
+
+        if (csvKeys.size() > 0) {
+            for (int key : csvKeys) {
+                if (key >= 0) {
+                    tree.insert(key);
+                    graphComponent = new Graph(tree).getGraphComponent();
+                    panel.remove(0);
+                    panel.add(graphComponent);
+                    f.revalidate();
+                    f.repaint();
+                    Thread.sleep(1000);
+                }
+            }
+        }
     }
 
     static private void add(Tree tree, String input, JPanel panel, JFrame f) {
