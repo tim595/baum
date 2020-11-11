@@ -2,8 +2,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -38,12 +36,18 @@ public class Gui {
         Box addBox = new Box(0);
         JButton addButton=new JButton("Add");//creating instance of JButton
         JTextField addInput = new JTextField("", 10);
+        JLabel addDescription = new JLabel();
+        addDescription.setText("Add new elements   ");
+        addBox.add(addDescription);
         addBox.add(addInput);
         addBox.add(addButton);
 
         Box deleteBox = new Box(0);
         JButton deleteButton = new JButton("Delete");
         JTextField deleteInput = new JTextField("", 10);
+        JLabel deleteDescription = new JLabel();
+        deleteDescription.setText("Delete elements   ");
+        deleteBox.add(deleteDescription);
         deleteBox.add(deleteInput);
         deleteBox.add(deleteButton);
 
@@ -61,7 +65,7 @@ public class Gui {
         }
 
         Box addQueueBox = new Box(0);
-        JButton nextButton = new JButton("Insert element from queue");
+        JButton nextButton = new JButton("Insert next element");
         String queueKeys = "";
         for (int key : keysToInsert) {
             queueKeys += String.valueOf(key + "  ");
@@ -79,7 +83,7 @@ public class Gui {
 
 
         Box deleteQueueBox = new Box(0);
-        JButton nextDeleteButton = new JButton("Delete element from queue");
+        JButton nextDeleteButton = new JButton("Delete next element");
         String deleteQueueKeys = "";
         for (int key : keysToDelete) {
             deleteQueueKeys += String.valueOf(key + "  ");
@@ -92,10 +96,9 @@ public class Gui {
         deleteQueueElements.setCaretPosition(0);
         deleteQueueBox.add(nextDeleteButton);
         deleteQueueBox.add(deleteQueueElements);
-        deleteQueueBox.setBorder(new EmptyBorder(0, 15, 0, 0));
+        deleteQueueBox.setBorder(new EmptyBorder(0, 30, 0, 0));
         deleteBox.add(deleteQueueBox);
         deleteBox.setBorder(new EmptyBorder(0, 0, 20, 0));
-
 
         Box box3 = new Box(0);
         JButton pickFileButton = new JButton("Load CSV file");
@@ -116,17 +119,15 @@ public class Gui {
         Box searchBox = new Box(0);
         JButton searchButton = new JButton("Search");
         JTextField searchInput = new JTextField("", 10);
+        JLabel searchDescription = new JLabel();
+        searchDescription.setText("Search node with specific key   ");
+        searchBox.add(searchDescription);
         searchBox.add(searchInput);
+        searchBox.setBorder(new EmptyBorder(0, 0, 20, 0));
         searchBox.add(searchButton);
 
         Box searchResultBox = new Box(0);
-        String searchResult = "";
-        /*
-        for (int key : keysToInsert) {
-            deleteQueueKeys += String.valueOf(key + "  ");
-        }
-        */
-        JTextField searchResultText = new JTextField(searchResult, 30);
+        JTextField searchResultText = new JTextField("", 30);
         searchResultText.setEnabled(false);
         searchResultText.setDisabledTextColor(Color.BLACK);
         searchResultText.setText(deleteQueueKeys);
@@ -135,116 +136,34 @@ public class Gui {
         searchResultBox.setBorder(new EmptyBorder(0, 30, 0, 0));
         searchBox.add(searchResultBox);
 
+        Box randomValBox = new Box(0);
+        JButton randomValButton = new JButton("Add random values");
+        randomValBox.add(randomValButton);
+        randomValBox.setBorder(new EmptyBorder(0, 0, 20, 1000));
+
         Box controlBox = new Box(1);
         controlBox.add(addBox);
         controlBox.add(deleteBox);
         controlBox.add(searchBox);
+        controlBox.add(randomValBox);
 
         JPanel controlPanel = new JPanel();
         controlPanel.add(controlBox);
         f.add(controlPanel, BorderLayout.PAGE_END);
 
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String[] inputArray = addInput.getText().split(",");
-                // wenn die Warteschlange leer ist, wird Element direkt zu Baum hinzugefügt, ansonsten wird/werden alle eingegebenen Elemente zur Warteschlange hinzugefügt
-                if (keysToInsert.size() == 0) buttonPressed(tree, inputArray[0].trim(), panel, f);
-                else {
+        addButton.addActionListener(e -> {
+            String[] inputArray = addInput.getText().split(",");
+            // wenn die Warteschlange leer ist, wird Element direkt zu Baum hinzugefügt, ansonsten wird/werden alle eingegebenen Elemente zur Warteschlange hinzugefügt
+            if (keysToInsert.size() == 0) add(tree, inputArray[0].trim(), panel, f);
+            else {
+                if (Integer.parseInt(inputArray[0].trim()) >= 0) {
                     keysToInsert.add(Integer.valueOf(inputArray[0].trim()));
                     addQueueBox.remove(1);
-                    String queueKeys = "";
+                    String newQueueKeys = "";
                     for (int key : keysToInsert) {
-                        queueKeys += String.valueOf(key + "  ");
+                        newQueueKeys += String.valueOf(key + "  ");
                     }
-                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
-                    newQueueTextfield.setEnabled(false);
-                    newQueueTextfield.setDisabledTextColor(Color.BLACK);
-                    newQueueTextfield.setCaretPosition(0);
-                    addQueueBox.add(newQueueTextfield);
-                    addQueueBox.revalidate();
-                    addQueueBox.repaint();
-                }
-                if (inputArray.length > 1) {
-                    for (int i = 1; i<inputArray.length; i++) {
-                        keysToInsert.add(Integer.valueOf(inputArray[i].trim()));
-                    }
-                    addQueueBox.remove(1);
-                    String queueKeys = "";
-                    for (int key : keysToInsert) {
-                        queueKeys += key + "  ";
-                    }
-                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
-                    newQueueTextfield.setEnabled(false);
-                    newQueueTextfield.setDisabledTextColor(Color.BLACK);
-                    newQueueTextfield.setCaretPosition(0);
-                    addQueueBox.add(newQueueTextfield);
-                    addQueueBox.revalidate();
-                    addQueueBox.repaint();
-                }
-                addInput.setText("");
-            }
-        });
-
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String[] inputArray = deleteInput.getText().split(",");
-                // wenn die Warteschlange leer ist, wird Element direkt zu Baum hinzugefügt, ansonsten wird/werden alle eingegebenen Elemente zur Warteschlange hinzugefügt
-                if (keysToDelete.size() == 0) delete(tree, inputArray[0].trim(), panel, f);
-                else {
-                    keysToDelete.add(Integer.valueOf(inputArray[0].trim()));
-                    deleteQueueBox.remove(1);
-                    String queueKeys = "";
-                    for (int key : keysToDelete) {
-                        queueKeys += key + "  ";
-                    }
-                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
-                    newQueueTextfield.setEnabled(false);
-                    newQueueTextfield.setDisabledTextColor(Color.BLACK);
-                    newQueueTextfield.setCaretPosition(0);
-                    addQueueBox.add(newQueueTextfield);
-                    addQueueBox.revalidate();
-                    addQueueBox.repaint();
-                }
-                if (inputArray.length > 1) {
-                    for (int i = 1; i<inputArray.length; i++) {
-                        keysToDelete.add(Integer.valueOf(inputArray[i].trim()));
-                    }
-                    deleteQueueBox.remove(1);
-                    String queueKeys = "";
-                    for (int key : keysToDelete) {
-                        queueKeys += key + "  ";
-                    }
-                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
-                    newQueueTextfield.setEnabled(false);
-                    newQueueTextfield.setDisabledTextColor(Color.BLACK);
-                    newQueueTextfield.setCaretPosition(0);
-                    deleteQueueBox.add(newQueueTextfield);
-                    deleteQueueBox.revalidate();
-                    deleteQueueBox.repaint();
-                }
-                deleteInput.setText("");
-            }
-        });
-
-        nextButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (keysToInsert.size() > 0) {
-                    tree.insert(keysToInsert.get(0));
-                    keysToInsert.remove(0);
-                    mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();
-                    panel.remove(0);
-                    panel.add(graphComponent);
-                    f.revalidate();
-                    f.repaint();
-                    addQueueBox.remove(1);
-                    String queueKeys = "";
-                    for (int key : keysToInsert) {
-                        queueKeys += String.valueOf(key + "  ");
-                    }
-                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
+                    JTextField newQueueTextfield = new JTextField(newQueueKeys, 30);
                     newQueueTextfield.setEnabled(false);
                     newQueueTextfield.setDisabledTextColor(Color.BLACK);
                     newQueueTextfield.setCaretPosition(0);
@@ -253,107 +172,203 @@ public class Gui {
                     addQueueBox.repaint();
                 }
             }
+            if (inputArray.length > 1) {
+                for (int i = 1; i<inputArray.length; i++) {
+                    if (Integer.parseInt(inputArray[i].trim()) >= 0) keysToInsert.add(Integer.valueOf(inputArray[i].trim()));
+                }
+                addQueueBox.remove(1);
+                String newQueueKeys = "";
+                for (int key : keysToInsert) {
+                    newQueueKeys += key + "  ";
+                }
+                JTextField newQueueTextfield = new JTextField(newQueueKeys, 30);
+                newQueueTextfield.setEnabled(false);
+                newQueueTextfield.setDisabledTextColor(Color.BLACK);
+                newQueueTextfield.setCaretPosition(0);
+                addQueueBox.add(newQueueTextfield);
+                addQueueBox.revalidate();
+                addQueueBox.repaint();
+            }
+            addInput.setText("");
         });
 
-        nextDeleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (keysToDelete.size() > 0) {
-                    tree.delete(keysToDelete.get(0));
-                    keysToDelete.remove(0);
-                    mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();
-                    panel.remove(0);
-                    panel.add(graphComponent);
-                    f.revalidate();
-                    f.repaint();
-                    deleteQueueBox.remove(1);
-                    String queueKeys = "";
-                    for (int key : keysToDelete) {
-                        queueKeys += key + "  ";
-                    }
-                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
-                    newQueueTextfield.setEnabled(false);
-                    newQueueTextfield.setDisabledTextColor(Color.BLACK);
-                    newQueueTextfield.setCaretPosition(0);
-                    deleteQueueBox.add(newQueueTextfield);
-                    deleteQueueBox.revalidate();
-                    deleteQueueBox.repaint();
+        deleteButton.addActionListener(e -> {
+            String[] inputArray = deleteInput.getText().split(",");
+            // wenn die Warteschlange leer ist, wird Element direkt zu Baum hinzugefügt, ansonsten wird/werden alle eingegebenen Elemente zur Warteschlange hinzugefügt
+            if (keysToDelete.size() == 0) delete(tree, inputArray[0].trim(), panel, f);
+            else {
+                keysToDelete.add(Integer.valueOf(inputArray[0].trim()));
+                deleteQueueBox.remove(1);
+                String newQueueKeys = "";
+                for (int key : keysToDelete) {
+                    newQueueKeys += key + "  ";
+                }
+                JTextField newQueueTextfield = new JTextField(newQueueKeys, 30);
+                newQueueTextfield.setEnabled(false);
+                newQueueTextfield.setDisabledTextColor(Color.BLACK);
+                newQueueTextfield.setCaretPosition(0);
+                addQueueBox.add(newQueueTextfield);
+                addQueueBox.revalidate();
+                addQueueBox.repaint();
+            }
+            if (inputArray.length > 1) {
+                for (int i = 1; i<inputArray.length; i++) {
+                    keysToDelete.add(Integer.valueOf(inputArray[i].trim()));
+                }
+                deleteQueueBox.remove(1);
+                String newQueueKeys = "";
+                for (int key : keysToDelete) {
+                    newQueueKeys += key + "  ";
+                }
+                JTextField newQueueTextfield = new JTextField(newQueueKeys, 30);
+                newQueueTextfield.setEnabled(false);
+                newQueueTextfield.setDisabledTextColor(Color.BLACK);
+                newQueueTextfield.setCaretPosition(0);
+                deleteQueueBox.add(newQueueTextfield);
+                deleteQueueBox.revalidate();
+                deleteQueueBox.repaint();
+            }
+            deleteInput.setText("");
+        });
+
+        nextButton.addActionListener(e -> {
+            if (keysToInsert.size() > 0) {
+                tree.insert(keysToInsert.get(0));
+                keysToInsert.remove(0);
+                mxGraphComponent graphComponent12 = new Graph(tree).getGraphComponent();
+                panel.remove(0);
+                panel.add(graphComponent12);
+                f.revalidate();
+                f.repaint();
+                addQueueBox.remove(1);
+                String newQueueKeys = "";
+                for (int key : keysToInsert) {
+                    newQueueKeys += String.valueOf(key + "  ");
+                }
+                JTextField newQueueTextfield = new JTextField(newQueueKeys, 30);
+                newQueueTextfield.setEnabled(false);
+                newQueueTextfield.setDisabledTextColor(Color.BLACK);
+                newQueueTextfield.setCaretPosition(0);
+                addQueueBox.add(newQueueTextfield);
+                addQueueBox.revalidate();
+                addQueueBox.repaint();
+            }
+        });
+
+        nextDeleteButton.addActionListener(e -> {
+            if (keysToDelete.size() > 0) {
+                tree.delete(keysToDelete.get(0));
+                keysToDelete.remove(0);
+                mxGraphComponent graphComponent1 = new Graph(tree).getGraphComponent();
+                panel.remove(0);
+                panel.add(graphComponent1);
+                f.revalidate();
+                f.repaint();
+                deleteQueueBox.remove(1);
+                String newQueueKeys = "";
+                for (int key : keysToDelete) {
+                    newQueueKeys += key + "  ";
+                }
+                JTextField newQueueTextfield = new JTextField(newQueueKeys, 30);
+                newQueueTextfield.setEnabled(false);
+                newQueueTextfield.setDisabledTextColor(Color.BLACK);
+                newQueueTextfield.setCaretPosition(0);
+                deleteQueueBox.add(newQueueTextfield);
+                deleteQueueBox.revalidate();
+                deleteQueueBox.repaint();
+            }
+        });
+
+        searchButton.addActionListener(e -> {
+            String searchKey = searchInput.getText();
+            Node searchResultNode;
+            if (searchKey != null) {
+                searchResultNode = search(tree, searchKey.trim(), panel, f);
+                if (searchResultNode != null) {
+                    searchBox.remove(3);
+                    String cost = "Cost of search: " + String.valueOf(searchResultNode.searchCost);
+                    JTextField costTextField = new JTextField(cost, 30);
+                    costTextField.setEnabled(false);
+                    costTextField.setDisabledTextColor(Color.BLACK);
+                    costTextField.setCaretPosition(0);
+                    costTextField.setBorder(new EmptyBorder(0, 30, 0, 0));
+                    searchBox.add(costTextField);
+                    searchBox.revalidate();
+                    searchBox.repaint();
                 }
             }
         });
 
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String searchKey = searchInput.getText();
-                Node searchResultNode;
-                if (searchKey != null) {
-                    searchResultNode = search(tree, searchKey.trim(), panel, f);
-                    if (searchResultNode != null) {
-                        searchBox.remove(2);
-                        String cost = "Cost of search: " + String.valueOf(searchResultNode.searchCost);
-                        JTextField costTextField = new JTextField(cost, 30);
-                        costTextField.setEnabled(false);
-                        costTextField.setDisabledTextColor(Color.BLACK);
-                        costTextField.setCaretPosition(0);
-                        costTextField.setBorder(new EmptyBorder(0, 30, 0, 0));
-                        searchBox.add(costTextField);
-                        searchBox.revalidate();
-                        searchBox.repaint();
-                    }
-                }
-            }
-        });
-
-        pickFileButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int returnVal = fc.showDialog(f, "Okay");
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = fc.getSelectedFile();
-                    try {
-                        Scanner fileReader = new Scanner(file);
-                        List<String> keys = new ArrayList<>();
-                        String values = "";
-                        while (fileReader.hasNextLine()) {
-                            for (String s : fileReader.nextLine().split(",")) {
-                                keys.add(s);
-                                values += s + " " ;
-                            }
+        pickFileButton.addActionListener(e -> {
+            int returnVal = fc.showDialog(f, "Okay");
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                try {
+                    Scanner fileReader = new Scanner(file);
+                    List<String> keys = new ArrayList<>();
+                    String values = "";
+                    while (fileReader.hasNextLine()) {
+                        for (String s : fileReader.nextLine().split(",")) {
+                            keys.add(s);
+                            values += s + " " ;
                         }
-                        Object[] options = {"Yes",
-                                "Cancel"};
-                        int chosenOptionVal = JOptionPane.showOptionDialog(f, "Do you want to add these values?\n" + values, "Please confirm", JOptionPane.YES_NO_OPTION,
-                                JOptionPane.QUESTION_MESSAGE,
-                                null,
-                                options, options[0]);
-                        if (chosenOptionVal == JOptionPane.YES_OPTION) {
-                            for (String key : keys) {
-                                keysToInsert.add(Integer.parseInt(key.trim()));
-                            }
-                            String queueKeys = "";
-                            for (int key : keysToInsert) {
-                                queueKeys += String.valueOf(key + "  ");
-                            }
-                            addQueueBox.remove(1);
-                            JTextField newQueueTextfield = new JTextField(queueKeys, 10);
-                            newQueueTextfield.setEnabled(false);
-                            newQueueTextfield.setDisabledTextColor(Color.BLACK);
-                            newQueueTextfield.setCaretPosition(0);
-                            addQueueBox.add(newQueueTextfield);
-                            addQueueBox.revalidate();
-                            addQueueBox.repaint();
-                        }
-                    } catch (FileNotFoundException ex) {
-                        ex.printStackTrace();
                     }
+                    Object[] options = {"Yes",
+                            "Cancel"};
+                    int chosenOptionVal = JOptionPane.showOptionDialog(f, "Do you want to add these values?\n" + values, "Please confirm", JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            options, options[0]);
+                    if (chosenOptionVal == JOptionPane.YES_OPTION) {
+                        for (String key : keys) {
+                            keysToInsert.add(Integer.parseInt(key.trim()));
+                        }
+                        String newQueueKeys = "";
+                        for (int key : keysToInsert) {
+                            newQueueKeys += String.valueOf(key + "  ");
+                        }
+                        addQueueBox.remove(1);
+                        JTextField newQueueTextfield = new JTextField(newQueueKeys, 10);
+                        newQueueTextfield.setEnabled(false);
+                        newQueueTextfield.setDisabledTextColor(Color.BLACK);
+                        newQueueTextfield.setCaretPosition(0);
+                        addQueueBox.add(newQueueTextfield);
+                        addQueueBox.revalidate();
+                        addQueueBox.repaint();
+                    }
+                } catch (FileNotFoundException ex) {
+                    ex.printStackTrace();
                 }
             }
         });
+
+        JTextField randomMin = new JTextField(5);
+        JTextField randomMax = new JTextField(5);
+        JTextField numOfElements = new JTextField(5);
+
+        JPanel randomizePanel = new JPanel();
+        randomizePanel.add(new JLabel("Minimum value:"));
+        randomizePanel.add(randomMin);
+        randomizePanel.add(Box.createHorizontalStrut(15)); // a spacer
+        randomizePanel.add(new JLabel("Maximum value:"));
+        randomizePanel.add(randomMax);
+        randomizePanel.add(Box.createHorizontalStrut(15)); // a spacer
+        randomizePanel.add(new JLabel("Number of elements:"));
+        randomizePanel.add(numOfElements);
+
+        randomValButton.addActionListener(e -> {
+            Object[] options = {"Add",
+                    "Cancel"};
+            int result = JOptionPane.showConfirmDialog(f, randomizePanel, "Add random elements", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                addRandomKeys(randomMin.getText(), randomMax.getText(), numOfElements.getText(), tree, panel, f, addQueueBox);
+            }
+        });
+
         f.setVisible(true);
     }
 
-    static private void buttonPressed(Tree tree, String input, JPanel panel, JFrame f) {
+    static private void add(Tree tree, String input, JPanel panel, JFrame f) {
         try {
             int inputValue = Integer.parseInt(input);
             if (inputValue >= 0) {
@@ -397,5 +412,47 @@ public class Gui {
 
             return node;
         } else return null;
+    }
+
+    static private void addRandomKeys(String minimum, String maximum, String numberOfElements, Tree tree, JPanel panel, JFrame f, Box addQueueBox) {
+        int[] randomKeys = new int[Integer.parseInt(numberOfElements)];
+        int min = Integer.parseInt(minimum);
+        int max = Integer.parseInt(maximum);
+        int range = max - min + 1;
+
+        for (int i = 0; i < Integer.parseInt(numberOfElements); i++) {
+            randomKeys[i] = (int)(Math.random() * range) + min;
+        }
+
+        if (keysToInsert.size() == 0) {
+            if (randomKeys[0] >= 0) {
+                tree.insert(randomKeys[0]);
+                mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();
+                panel.remove(0);
+                panel.add(graphComponent);
+                f.revalidate();
+                f.repaint();
+            }
+            for (int i = 1; i<randomKeys.length; i++) {
+                if (randomKeys[i] >= 0) keysToInsert.add(randomKeys[i]);
+            }
+        } else {
+            for (int key : randomKeys) {
+                if (key >= 0) keysToInsert.add(key);
+            }
+        }
+        addQueueBox.remove(1);
+        String newQueueKeys = "";
+        for (int key : keysToInsert) {
+            newQueueKeys += key + "  ";
+        }
+
+        JTextField newQueueTextfield = new JTextField(newQueueKeys, 30);
+        newQueueTextfield.setEnabled(false);
+        newQueueTextfield.setDisabledTextColor(Color.BLACK);
+        newQueueTextfield.setCaretPosition(0);
+        addQueueBox.add(newQueueTextfield);
+        addQueueBox.revalidate();
+        addQueueBox.repaint();
     }
 }
