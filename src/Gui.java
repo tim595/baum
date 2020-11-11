@@ -81,11 +81,10 @@ public class Gui {
         Box deleteQueueBox = new Box(0);
         JButton nextDeleteButton = new JButton("Delete element from queue");
         String deleteQueueKeys = "";
-        /*
-        for (int key : keysToInsert) {
+        for (int key : keysToDelete) {
             deleteQueueKeys += String.valueOf(key + "  ");
         }
-        */
+
         JTextField deleteQueueElements = new JTextField(deleteQueueKeys, 30);
         deleteQueueElements.setEnabled(false);
         deleteQueueElements.setDisabledTextColor(Color.BLACK);
@@ -136,8 +135,6 @@ public class Gui {
         searchResultBox.setBorder(new EmptyBorder(0, 30, 0, 0));
         searchBox.add(searchResultBox);
 
-
-
         Box controlBox = new Box(1);
         controlBox.add(addBox);
         controlBox.add(deleteBox);
@@ -145,14 +142,6 @@ public class Gui {
 
         JPanel controlPanel = new JPanel();
         controlPanel.add(controlBox);
-        // controlPanel.add(addBox);
-        /*
-        controlPanel.add(deleteBox);
-        controlPanel.add(box2);
-        controlPanel.add(box3);
-        controlPanel.add(searchBox);
-
-         */
         f.add(controlPanel, BorderLayout.PAGE_END);
 
         addButton.addActionListener(new ActionListener() {
@@ -183,7 +172,7 @@ public class Gui {
                     addQueueBox.remove(1);
                     String queueKeys = "";
                     for (int key : keysToInsert) {
-                        queueKeys += String.valueOf(key + "  ");
+                        queueKeys += key + "  ";
                     }
                     JTextField newQueueTextfield = new JTextField(queueKeys, 30);
                     newQueueTextfield.setEnabled(false);
@@ -193,7 +182,6 @@ public class Gui {
                     addQueueBox.revalidate();
                     addQueueBox.repaint();
                 }
-                System.out.println(keysToInsert);
                 addInput.setText("");
             }
         });
@@ -202,26 +190,43 @@ public class Gui {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String[] inputArray = deleteInput.getText().split(",");
-                // wenn die Warteschlange leer ist, wird Element direkt vom Baum entfernt, ansonsten wird/werden alle eingegebenen Elemente zur Warteschlange hinzugefügt
+                // wenn die Warteschlange leer ist, wird Element direkt zu Baum hinzugefügt, ansonsten wird/werden alle eingegebenen Elemente zur Warteschlange hinzugefügt
                 if (keysToDelete.size() == 0) delete(tree, inputArray[0].trim(), panel, f);
-                /*else {
-                    keysToInsert.add(Integer.valueOf(inputArray[0].trim()));
-                    box2.remove(1);
+                else {
+                    keysToDelete.add(Integer.valueOf(inputArray[0].trim()));
+                    deleteQueueBox.remove(1);
                     String queueKeys = "";
-                    for (int key : keysToInsert) {
-                        queueKeys += String.valueOf(key + "  ");
+                    for (int key : keysToDelete) {
+                        queueKeys += key + "  ";
                     }
-                    JTextField newQueueTextfield = new JTextField(queueKeys, 10);
+                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
                     newQueueTextfield.setEnabled(false);
                     newQueueTextfield.setDisabledTextColor(Color.BLACK);
                     newQueueTextfield.setCaretPosition(0);
-                    box2.add(newQueueTextfield);
-                    box2.revalidate();
-                    box2.repaint();
-                }*/
+                    addQueueBox.add(newQueueTextfield);
+                    addQueueBox.revalidate();
+                    addQueueBox.repaint();
+                }
+                if (inputArray.length > 1) {
+                    for (int i = 1; i<inputArray.length; i++) {
+                        keysToDelete.add(Integer.valueOf(inputArray[i].trim()));
+                    }
+                    deleteQueueBox.remove(1);
+                    String queueKeys = "";
+                    for (int key : keysToDelete) {
+                        queueKeys += key + "  ";
+                    }
+                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
+                    newQueueTextfield.setEnabled(false);
+                    newQueueTextfield.setDisabledTextColor(Color.BLACK);
+                    newQueueTextfield.setCaretPosition(0);
+                    deleteQueueBox.add(newQueueTextfield);
+                    deleteQueueBox.revalidate();
+                    deleteQueueBox.repaint();
+                }
+                deleteInput.setText("");
             }
         });
-
 
         nextButton.addActionListener(new ActionListener() {
             @Override
@@ -246,6 +251,33 @@ public class Gui {
                     addQueueBox.add(newQueueTextfield);
                     addQueueBox.revalidate();
                     addQueueBox.repaint();
+                }
+            }
+        });
+
+        nextDeleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (keysToDelete.size() > 0) {
+                    tree.delete(keysToDelete.get(0));
+                    keysToDelete.remove(0);
+                    mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();
+                    panel.remove(0);
+                    panel.add(graphComponent);
+                    f.revalidate();
+                    f.repaint();
+                    deleteQueueBox.remove(1);
+                    String queueKeys = "";
+                    for (int key : keysToDelete) {
+                        queueKeys += key + "  ";
+                    }
+                    JTextField newQueueTextfield = new JTextField(queueKeys, 30);
+                    newQueueTextfield.setEnabled(false);
+                    newQueueTextfield.setDisabledTextColor(Color.BLACK);
+                    newQueueTextfield.setCaretPosition(0);
+                    deleteQueueBox.add(newQueueTextfield);
+                    deleteQueueBox.revalidate();
+                    deleteQueueBox.repaint();
                 }
             }
         });
