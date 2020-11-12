@@ -126,4 +126,14 @@ public class Tree {
         if (nodeThatContainsKey != null) nodeThatContainsKey.searchCost = searchCost;
         return nodeThatContainsKey;
     }
+
+    public void printTree() {
+        System.out.println("\t\t");
+        System.out.println(root.keys);
+        for (Node node : root.sons) {
+            System.out.print(node.keys + "\t");
+            System.out.print(node.parent);
+        }
+        System.out.println();
+    }
 }
