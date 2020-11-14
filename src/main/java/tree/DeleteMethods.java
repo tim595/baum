@@ -1,4 +1,4 @@
-package Tree;
+package tree;
 
 public class DeleteMethods {
     public static Node searchNodeForDelete(Node nodePointer, int key) {  // suche nach Delete-Node -> gibt null zurück, wenn keine Node mit übergebenen Key gefunden wird

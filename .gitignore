@@ -1,0 +1,10 @@
+# IntelliJ
+.idea/
+*.iml
+*.iws
+
+# Gradle
+.gradle
+build/
+out/
+https://github.com/jfinckh/baum.git

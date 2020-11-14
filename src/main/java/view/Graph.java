@@ -1,10 +1,10 @@
-package UI;
+package view;
 
-import Tree.Node;
-import Tree.Tree;
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
+import tree.Node;
+import tree.Tree;
 
 public class Graph {
     mxGraphComponent graphComponent;

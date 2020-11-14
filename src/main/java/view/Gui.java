@@ -1,19 +1,18 @@
-package UI;
+package view;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileFilter;
+import com.mxgraph.swing.mxGraphComponent;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-
-import Tree.Node;
-import Tree.Tree;
-import com.mxgraph.swing.mxGraphComponent;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import tree.Node;
+import tree.Tree;
 
 public class Gui {
     // static int[] keys = {1, 10, 20, 15, 16, 2, 3, 4, 5, 6, 7, 8, 17, 18, 19};

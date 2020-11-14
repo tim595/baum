@@ -1,7 +1,4 @@
-package Tree;
-
-import java.util.ArrayList;
-import java.util.List;
+package tree;
 
 public class Tree {
     private int m;
