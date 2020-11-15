@@ -26,7 +26,6 @@ public class Gui {
     public static void main(String[] args) throws InterruptedException {
         int m;
 
-
         Box box = new Box(1);
         box.setSize(100, 250);
         box.add(new JLabel("Welcome to the b-tree simulator!"));

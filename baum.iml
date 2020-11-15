@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../mxgraph/java/lib/mxgraph-all.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/mxgraph-all.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

@@ -1,27 +1,30 @@
 package Tree;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 public class InsertMethods {
-    public static Node searchNodeForInsert(Node nodePointer, int key) {  // suche nach Einfüge-Node -> falls Key bereits vorhanden, wird null zurückgegeben
-        if (nodePointer.getKeys().contains(key)) return null;
+    public static Optional<Node> getNodeForInsert(Node nodePointer, int key) {  // suche nach Einfüge-Node -> falls Key bereits vorhanden, wird null zurückgegeben
+        if (nodePointer.getKeys().contains(key)) return Optional.empty();
         else {
             while (!nodePointer.getSons().isEmpty()) {
                 for (int i = 0; i<nodePointer.getKeys().size(); i++) {
                     if (key < nodePointer.getKeys().get(i)) {
                         nodePointer = nodePointer.getSons().get(i);
-                        if (nodePointer.getKeys().contains(key)) return null;
+                        if (nodePointer.getKeys().contains(key)) return Optional.empty();
                         break;
                     } else if (key > nodePointer.getKeys().get(i) && i == nodePointer.getKeys().size()-1) {
                         nodePointer = nodePointer.getSons().get(i+1);
-                        if (nodePointer.getKeys().contains(key)) return null;
+                        if (nodePointer.getKeys().contains(key)) return Optional.empty();
                         break;
                     }
                 }
             }
-            if (nodePointer.getKeys().contains(key)) return null;
-            else return nodePointer;
+            if (nodePointer.getKeys().contains(key)) return Optional.empty();
+            else return Optional.of(nodePointer);
         }
     }
 
@@ -48,7 +51,7 @@ public class InsertMethods {
     }
 
     public static Node splitNonRoot(Node nodePointer, int m) {
-        int splitKey = (int)Math.floor((m-1)/2);
+        int splitKey = (m-1)/2;
         int nodeIndex = nodePointer.getParent().getSons().indexOf(nodePointer);
         List<Integer> keysLeft = new ArrayList<Integer>();
         List<Integer> keysRight = new ArrayList<Integer>();
@@ -81,19 +84,54 @@ public class InsertMethods {
     }
 
 
-    public static void updateChildParentRelations(Node nodePointer, Node root, int splitKey) {
+    public static void updateChildParentRelations(Node nodePointer, int splitKey) {
         for (int i = 0; i<nodePointer.getSons().size(); i++) {
             if (i <= splitKey) {
-                nodePointer.getSons().get(i).setParent(root.getSons().get(0));
+                nodePointer.getSons().get(i).setParent(Tree.root.getSons().get(0));
             } else {
-                nodePointer.getSons().get(i).setParent(root.getSons().get(1));
+                nodePointer.getSons().get(i).setParent(Tree.root.getSons().get(1));
             }
         }
         for (int i = 0; i<=splitKey; i++) {
-            root.getSons().get(0).setSon(nodePointer.getSons().get(i));
+            Tree.root.getSons().get(0).setSon(nodePointer.getSons().get(i));
         }
         for (int i = nodePointer.getSons().size()-1; i>splitKey; i--) {
-            root.getSons().get(1).setSon(0, nodePointer.getSons().get(i));
+            Tree.root.getSons().get(1).setSon(0, nodePointer.getSons().get(i));
+        }
+    }
+
+
+    public static void addKeyIfNotExisting(int key, Node nodePointer, int m) {
+        if (!nodePointer.getKeys().contains(key)) {   // Neuer Key wird eingefügt, sofern er nicht bereits vorhanden ist
+            nodePointer.insertKey(key);
+            if (nodePointer.hasOverflown()) {   // Wurzel wird gesplittet, falls Anzahl zulässiger Schlüssel pro Knoten überschritten wurde
+                int splitKey = (m-1)/2;
+                Tree.root = splitRoot(nodePointer, splitKey, m);
+            }
+        }
+    }
+
+    public static Consumer<Node> insertAndResolveOverflows(int key, int m) {
+        return (Node pNodePointer) ->  {
+            pNodePointer.insertKey(key);
+            resolveOverflows(pNodePointer, m);
+        };
+    }
+
+    private static void resolveOverflows(Node nodePointer, int m) {
+        boolean overflow = nodePointer.hasOverflown();
+        // Bei Overflow wird Knoten gesplittet, der nodePointer auf das parent-Element gesetzt und hier auf erneuten Overflow geprüft
+        while (overflow) {
+            if (nodePointer.getParent() != null) {   // Nicht-wurzel-Split
+                System.out.println(1);
+                nodePointer = InsertMethods.splitNonRoot(nodePointer, m);  // Knoten wird gesplittet, anschließend wird nodePointer auf dessen parent gesetzt
+                overflow = nodePointer.hasOverflown();
+            } else {   // Wurzel-Split
+                System.out.println(2);
+                Tree.root = splitRoot(nodePointer, (m-1)/2, m);
+                InsertMethods.updateChildParentRelations(nodePointer,(m-1)/2);   // Da die Wurzel in diesem Fall jedoch Söhne besitzt, müssen die Beziehungen aktualisiert werden
+                overflow = false;
+            }
         }
     }
 }
