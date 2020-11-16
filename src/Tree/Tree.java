@@ -1,7 +1,5 @@
 package Tree;
 
-import java.util.function.Consumer;
-
 public class Tree {
     public static Node root;
     private int m;
@@ -33,74 +31,22 @@ public class Tree {
     }
 
     public void delete(int key) {
-        if (root.getSons().size() == 0) {  // Löschen aus Wurzel (wenn diese noch keine Söhne besitzt)
+        if (root.getSons().isEmpty()) {  // Löschen aus Wurzel (wenn diese noch keine Söhne besitzt)
             if (root.getKeys().contains(key)) {
                 root.removeKey(key);
             }
         } else {
-            nodePointer = DeleteMethods.searchNodeForDelete(root, key);
-            if (nodePointer != null) {
-                if (nodePointer.getSons().size() == 0) { // Löschen aus Blatt
-                    nodePointer.removeKey(key);
-                } else {  // Löschen aus innerem Knoten
-                    nodePointer = DeleteMethods.deleteFromInnerNode(nodePointer, key);
-                }
-                boolean underflow = nodePointer.hasUnderflown();   // Prüfung auf Underflow
-                while (underflow) {
-                    boolean balanced;
-                    int nodePointerIndex = nodePointer.getParent().getSons().indexOf(nodePointer);
-
-                    balanced = DeleteMethods.balance(nodePointer,nodePointerIndex, minimumKeys);  // versuchen, Underflow auszugleichen, indem Nachbarn Schlüssel abgeben
-                    if (!balanced) DeleteMethods.merge(nodePointer, nodePointerIndex);  // wenn nicht ausbalanciert werden konnte -> Merge
-
-                    if (nodePointer.getParent() != root) {  // wenn parent von nodePointer nicht die root ist, wird bei parent auf erneuten Overflow geprüft
-                        nodePointer = nodePointer.getParent();
-                        underflow = nodePointer.hasUnderflown();
-                    } else {   // wenn parent von nodePointer die root ist, wird geprüft ob diese noch Keys enthält, falls nicht ist nodePointer die neue root
-                        if (root.getKeys().size() > 0) underflow = false;
-                        else {
-                            nodePointer.setParent(null);
-                            root = nodePointer;
-                            underflow = false;
-                        }
-                    }
-                }
-            }
+            DeleteMethods.getNodeForDelete(root, key)
+                    .ifPresent(DeleteMethods.deleteAndResolveUnderflows(key, minimumKeys));
         }
     }
 
     public Node search(int key) {
-        Node nodeThatContainsKey;
-        int searchCost = 1;
-
         nodePointer = root;
-        if (nodePointer.getKeys().contains(key)) nodeThatContainsKey =  nodePointer;   // Fall, dass root den Key enthält
-        else {
-            while (!nodePointer.getSons().isEmpty()) {   // von root aus wird so lange nach unten gewandert, bis aktuelle Node keine Söhne besitzt oder den gesuchten Key enthält
-                for (int i = 0; i<nodePointer.getKeys().size(); i++) {
-                    if (key < nodePointer.getKeys().get(i)) {
-                        searchCost++;
-                        nodePointer = nodePointer.getSons().get(i);
-                        if (nodePointer.getKeys().contains(key)) {
-                            nodePointer.setSearchCost(searchCost);
-                            return nodePointer;
-                        }
-                        break;
-                    } else if (key > nodePointer.getKeys().get(i) && i == nodePointer.getKeys().size()-1) {
-                        searchCost++;
-                        nodePointer = nodePointer.getSons().get(i+1);
-                        if (nodePointer.getKeys().contains(key)) {
-                            nodePointer.setSearchCost(searchCost);
-                            return nodePointer;
-                        }
-                        break;
-                    }
-                }
-            }
-            if (nodePointer.getKeys().contains(key)) nodeThatContainsKey = nodePointer;
-            else nodeThatContainsKey = null;  // wird Key nicht gefunden, gibt die Methode null zurück
+        if (nodePointer.getKeys().contains(key)) {   // Fall, dass root den Key enthält
+            return SearchMethods.getRootElement(nodePointer);
+        } else {
+            return SearchMethods.lookupChildNodes(nodePointer, key);
         }
-        if (nodeThatContainsKey != null) nodeThatContainsKey.setSearchCost(searchCost);
-        return nodeThatContainsKey;
     }
 }

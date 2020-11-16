@@ -112,9 +112,9 @@ public class InsertMethods {
     }
 
     public static Consumer<Node> insertAndResolveOverflows(int key, int m) {
-        return (Node pNodePointer) ->  {
-            pNodePointer.insertKey(key);
-            resolveOverflows(pNodePointer, m);
+        return (Node nodePointer) ->  {
+            nodePointer.insertKey(key);
+            resolveOverflows(nodePointer, m);
         };
     }
 

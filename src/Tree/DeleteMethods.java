@@ -1,24 +1,61 @@
 package Tree;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
 public class DeleteMethods {
-    public static Node searchNodeForDelete(Node nodePointer, int key) {  // suche nach Delete-Node -> gibt null zurück, wenn keine Node mit übergebenen Key gefunden wird
-        if (nodePointer.getKeys().contains(key)) return nodePointer;
+    public static Optional<Node> getNodeForDelete(Node nodePointer, int key) {  // suche nach Delete-Node -> gibt null zurück, wenn keine Node mit übergebenen Key gefunden wird
+        if (nodePointer.getKeys().contains(key)) return Optional.of(nodePointer);
         else {
             while (!nodePointer.getSons().isEmpty()) {
                 for (int i = 0; i<nodePointer.getKeys().size(); i++) {
                     if (key < nodePointer.getKeys().get(i)) {
                         nodePointer = nodePointer.getSons().get(i);
-                        if (nodePointer.getKeys().contains(key)) return nodePointer;
+                        if (nodePointer.getKeys().contains(key)) return Optional.of(nodePointer);
                         break;
                     } else if (key > nodePointer.getKeys().get(i) && i == nodePointer.getKeys().size()-1) {
                         nodePointer = nodePointer.getSons().get(i+1);
-                        if (nodePointer.getKeys().contains(key)) return nodePointer;
+                        if (nodePointer.getKeys().contains(key)) return Optional.of(nodePointer);
                         break;
                     }
                 }
             }
-            if (nodePointer.getKeys().contains(key)) return nodePointer;
-            else return null;
+            if (nodePointer.getKeys().contains(key)) return Optional.of(nodePointer);
+            else return Optional.empty();
+        }
+    }
+
+    public static Consumer<Node> deleteAndResolveUnderflows(int key, int minimumKeys) {
+        return (Node nodePointer) -> {
+            if (nodePointer.getSons().size() == 0) { // Löschen aus Blatt
+                nodePointer.removeKey(key);
+            } else {  // Löschen aus innerem Knoten
+                nodePointer = DeleteMethods.deleteFromInnerNode(nodePointer, key);
+            }
+            resolveUnderflows(nodePointer, minimumKeys);
+        };
+    }
+
+    private static void resolveUnderflows(Node nodePointer, int minimumKeys) {
+        boolean underflow = nodePointer.hasUnderflown();   // Prüfung auf Underflow
+        while (underflow) {
+            boolean balanced;
+            int nodePointerIndex = nodePointer.getParent().getSons().indexOf(nodePointer);
+
+            balanced = DeleteMethods.balance(nodePointer,nodePointerIndex, minimumKeys);  // versuchen, Underflow auszugleichen, indem Nachbarn Schlüssel abgeben
+            if (!balanced) DeleteMethods.merge(nodePointer, nodePointerIndex);  // wenn nicht ausbalanciert werden konnte -> Merge
+
+            if (nodePointer.getParent() != Tree.root) {  // wenn parent von nodePointer nicht die root ist, wird bei parent auf erneuten Overflow geprüft
+                nodePointer = nodePointer.getParent();
+                underflow = nodePointer.hasUnderflown();
+            } else {   // wenn parent von nodePointer die root ist, wird geprüft ob diese noch Keys enthält, falls nicht ist nodePointer die neue root
+                if (Tree.root.getKeys().size() > 0) underflow = false;
+                else {
+                    nodePointer.setParent(null);
+                    Tree.root = nodePointer;
+                    underflow = false;
+                }
+            }
         }
     }
 

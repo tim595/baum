@@ -92,14 +92,10 @@ public class Node {
 
     // gibt true zurück, wenn der Knoten im Overflow ist
     public boolean hasOverflown() {
-        return keys.size() > m - 1;
+        return keys.size() > m-1;
     }
 
     public boolean hasUnderflown() {
-        if (m%2 == 0) {
-            return keys.size() < (int) Math.floor((m - 1) / 2);
-        } else {
-            return keys.size() < (m - 1) / 2;
-        }
+        return keys.size() < (m-1)/2;
     }
 }
