@@ -11,11 +11,7 @@ public class Tree {
         root = new Node(m);
         minimumKeys = (m-1)/2;  // Ergebnis wird implizit abgerundet, somit keine Unterscheidung zw. geradem und ungeradem m notwendig
     }
-
-    public Node getRoot() {
-        return root;
-    }
-
+    
     public int getOrder() {
         return this.m;
     }

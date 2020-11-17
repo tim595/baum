@@ -20,22 +20,22 @@ public class Graph {
 
         try {
             String rootValues = "";
-            for (int i = 0; i<tree.getRoot().getKeys().size(); i++) {
-                rootValues += (tree.getRoot().getKeys().get(i));
-                if (i != tree.getRoot().getKeys().size()-1) rootValues += "   ";
+            for (int i = 0; i<Tree.root.getKeys().size(); i++) {
+                rootValues += (Tree.root.getKeys().get(i));
+                if (i != Tree.root.getKeys().size()-1) rootValues += "   ";
             }
 
             Object root;
-            if (nodeToHighlight.length != 0 && nodeToHighlight[0] == tree.getRoot()) {
+            if (nodeToHighlight.length != 0 && nodeToHighlight[0] == Tree.root) {
                 rootValues = "SELECTED\n" + rootValues;
                 root = graph.insertVertex(parent, null, rootValues, 0, 0, nodeWidth+30, 50);
             } else {
                 root = graph.insertVertex(parent, null, rootValues, 0, 0, nodeWidth, 30);
             }
 
-            if (tree.getRoot().getSons().size() != 0 ) {
-                if (nodeToHighlight.length != 0) displaySons(tree.getRoot(), graph, parent, root, nodeToHighlight[0]);
-                else displaySons(tree.getRoot(), graph, parent, root);
+            if (Tree.root.getSons().size() != 0 ) {
+                if (nodeToHighlight.length != 0) displaySons(Tree.root, graph, parent, root, nodeToHighlight[0]);
+                else displaySons(Tree.root, graph, parent, root);
             }
 
             mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
