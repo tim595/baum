@@ -6,6 +6,7 @@ import Tree.Node;
 import com.mxgraph.swing.mxGraphComponent;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.io.File;
@@ -174,5 +175,19 @@ public class GuiMethods {
         addQueueBox.add(newQueueTextfield);
         addQueueBox.revalidate();
         addQueueBox.repaint();
+    }
+
+    public static void clearSearchField(Box searchBox, JTextField searchInput) {
+        searchInput.setText("");
+        searchBox.remove(3);
+        String cost = "";
+        JTextField costTextField = new JTextField(cost, 30);
+        costTextField.setEnabled(false);
+        costTextField.setDisabledTextColor(Color.BLACK);
+        costTextField.setCaretPosition(0);
+        costTextField.setBorder(new EmptyBorder(0, 30, 0, 0));
+        searchBox.add(costTextField);
+        searchBox.revalidate();
+        searchBox.repaint();
     }
 }
