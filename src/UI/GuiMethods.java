@@ -126,6 +126,12 @@ public class GuiMethods {
                     panel.add(graphComponent);
                     f.revalidate();
                     f.repaint();
+                } else {
+                    mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();
+                    panel.remove(0);
+                    panel.add(graphComponent);
+                    f.revalidate();
+                    f.repaint();
                 }
                 return node;
             } else return null;

@@ -65,6 +65,7 @@ public class GuiElements {
             box.add(new JLabel("Do you want to build the new tree automatically via a csv file,"));
             box.add(new JLabel("or do you want to build it manually?"));
 
+            /*
             Object[] o = {"Automatic input via csv",
                     "Manual input"};
 
@@ -76,7 +77,9 @@ public class GuiElements {
 
             if (newOptionVal == JOptionPane.YES_OPTION) {
                 GuiMethods.pickCSV(csvKeys);
+                return changedOrder;
             }
+             */
         } catch (NumberFormatException nanException) {
             System.out.println("New order input is not a number");
         }

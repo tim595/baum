@@ -34,12 +34,15 @@ public class Gui {
         System.out.println("CSV");
         System.out.println(csvKeys);
 
+        /*
         if (csvKeys.size() != 0) {
             tree.insert(csvKeys.get(0));
             graphComponent = new Graph(tree).getGraphComponent();
             panel.remove(0);
             panel.add(graphComponent);
         }
+
+         */
 
         Box addBox = new Box(0);
         JButton addButton = new JButton("Add");
@@ -148,7 +151,6 @@ public class Gui {
         changeOrderButton.addActionListener(ButtonListeners.changeorderButtonAction(keysToInsert, keysToDelete, csvKeys, f));
 
         f.setVisible(true);
-        System.out.println(f.getComponents());
 
         if (csvKeys.size() > 0) {
             for (int key : csvKeys) {
