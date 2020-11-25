@@ -27,23 +27,11 @@ public class Gui {
         Graph graph = new Graph(tree);
         mxGraphComponent graphComponent = graph.getGraphComponent();
         JPanel panel = new JPanel();
-        JScrollPane scroller = new JScrollPane(panel);
+        JScrollPane scroller = new JScrollPane(panel);  // hierdurch wird das Fenster scrollbar, sobald der Baum zu groß wird
         panel.add(graphComponent);
         f.getContentPane().add(scroller);
 
-        System.out.println("CSV");
-        System.out.println(csvKeys);
-
-        /*
-        if (csvKeys.size() != 0) {
-            tree.insert(csvKeys.get(0));
-            graphComponent = new Graph(tree).getGraphComponent();
-            panel.remove(0);
-            panel.add(graphComponent);
-        }
-
-         */
-
+        // sämtliche Buttons, Eingabefelder, ..
         Box addBox = new Box(0);
         JButton addButton = new JButton("Add");
         JTextField addInput = new JTextField("", 10);
@@ -152,6 +140,7 @@ public class Gui {
 
         f.setVisible(true);
 
+        // automatisches Aufbauen für den Fall, dass Werte über csv reingeladen wurden (Element wird eingefügt -> Baum wird neu gezeichnet -> Programm pausiert 1 Sekunde)
         if (csvKeys.size() > 0) {
             for (int key : csvKeys) {
                 if (key >= 0) {

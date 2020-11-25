@@ -60,12 +60,12 @@ public class GuiElements {
             csvKeys.clear();
             f.dispatchEvent(new WindowEvent(f, WindowEvent.WINDOW_CLOSING));
 
+            /*
             Box box = new Box(1);
             box.setSize(100, 250);
             box.add(new JLabel("Do you want to build the new tree automatically via a csv file,"));
             box.add(new JLabel("or do you want to build it manually?"));
 
-            /*
             Object[] o = {"Automatic input via csv",
                     "Manual input"};
 

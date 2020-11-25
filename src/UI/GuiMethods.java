@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class GuiMethods {
-    public static void add(Tree tree, int inputValue, JPanel panel, JFrame f) {
+    public static void add(Tree tree, int inputValue, JPanel panel, JFrame f) {  // Element wird zu Baum hinzugefügt, dieser wird anschließend neu gezeichnet
         if (inputValue >= 0) {
             tree.insert(inputValue);
             mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();
@@ -28,7 +28,7 @@ public class GuiMethods {
         }
     }
 
-    public static void updateAddQueue(List<Integer> keysToInsert, Box addQueueBox) {
+    public static void updateAddQueue(List<Integer> keysToInsert, Box addQueueBox) {  // Element wird aus Warteschlange entfernt
         addQueueBox.remove(1);
         String newQueueKeys = "";
         for (int key : keysToInsert) {
@@ -43,7 +43,7 @@ public class GuiMethods {
         addQueueBox.repaint();
     }
 
-    public static void delete(Tree tree, int inputValue, JPanel panel, JFrame f) {
+    public static void delete(Tree tree, int inputValue, JPanel panel, JFrame f) {  // Element wird aus Baum entfernt, dieser wird anschließend neu gezeichnet
         if (inputValue >= 0) {
             tree.delete(inputValue);
             mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();
@@ -54,7 +54,7 @@ public class GuiMethods {
         }
     }
 
-    public static void updateDeleteQueue(List<Integer> keysToDelete, Box deleteQueueBox) {
+    public static void updateDeleteQueue(List<Integer> keysToDelete, Box deleteQueueBox) {  // Element wird aus Warteschlange entfernt
         deleteQueueBox.remove(1);
         String newQueueKeys = "";
         for (int key : keysToDelete) {
@@ -70,7 +70,7 @@ public class GuiMethods {
     }
 
 
-    public static void pickCSV(List<Integer> csvKeys) {
+    public static void pickCSV(List<Integer> csvKeys) {  // Dialog zum Auswählen einer csv Datei
         final JFileChooser fc = new JFileChooser();
         fc.setAcceptAllFileFilterUsed(false);
         FileFilter filter = new FileNameExtensionFilter("CSV File", "csv");
@@ -125,13 +125,13 @@ public class GuiMethods {
             if (inputValue >= 0) {
                 Node node = tree.search(inputValue);
                 if (node != null) {
-                    mxGraphComponent graphComponent = new Graph(tree, node).getGraphComponent();
+                    mxGraphComponent graphComponent = new Graph(tree, node).getGraphComponent();  // Node gefunden -> gesuchtes Element wird markiert
                     panel.remove(0);
                     panel.add(graphComponent);
                     f.revalidate();
                     f.repaint();
                 } else {
-                    mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();
+                    mxGraphComponent graphComponent = new Graph(tree).getGraphComponent();  // Node nicht gefunden -> kein Element wird markiert
                     panel.remove(0);
                     panel.add(graphComponent);
                     f.revalidate();

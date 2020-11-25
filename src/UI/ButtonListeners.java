@@ -76,6 +76,7 @@ public class ButtonListeners {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Wenn Warteschlange Elemente enthält, wird das nächste Element eingefügt
                 if (keysToInsert.size() > 0) {
                     GuiMethods.add(tree, keysToInsert.get(0), panel, f);
                     keysToInsert.remove(0);
@@ -90,6 +91,7 @@ public class ButtonListeners {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Wenn Warteschlange Elemente enthält, wird das nächste Element gelöscht
                 if (keysToDelete.size() > 0) {
                     GuiMethods.delete(tree, keysToDelete.get(0), panel, f);
                     keysToDelete.remove(0);
@@ -110,7 +112,7 @@ public class ButtonListeners {
                     searchResultNode = GuiMethods.search(tree, searchKey.trim(), panel, f);
                     if (searchResultNode != null) {
                         searchBox.remove(3);
-                        String cost = "Node found! Cost of search: " + String.valueOf(searchResultNode.getSearchCost());
+                        String cost = "Node found! Cost of search: " + searchResultNode.getSearchCost();
                         JTextField costTextField = new JTextField(cost, 30);
                         costTextField.setEnabled(false);
                         costTextField.setDisabledTextColor(Color.BLACK);
