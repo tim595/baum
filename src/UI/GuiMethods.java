@@ -8,6 +8,7 @@ import com.mxgraph.swing.mxGraphComponent;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,8 +72,11 @@ public class GuiMethods {
 
     public static void pickCSV(List<Integer> csvKeys) {
         final JFileChooser fc = new JFileChooser();
+        fc.setAcceptAllFileFilterUsed(false);
+        FileFilter filter = new FileNameExtensionFilter("CSV File", "csv");
+        fc.setFileFilter(filter);
 
-        int returnVal = fc.showDialog(null, "Choose a CSV file");
+        int returnVal = fc.showDialog(null, "Open file");
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             System.out.println("debug1");
             File file = fc.getSelectedFile();
