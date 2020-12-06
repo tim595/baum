@@ -85,7 +85,17 @@ public class GuiMethods {
                 List<String> keys = new ArrayList<>();
                 String values = "";
                 int counter = 0;
+                fileReader.nextLine(); // Header einlesen bzw ignorieren
                 while (fileReader.hasNextLine()) {
+                    counter++;
+                    String s = fileReader.nextLine();
+                    keys.add(s);
+                    values += s + "  ";
+                    if (counter == 12) {
+                        values += "\n";
+                        counter = 0;
+                    }
+                    /*
                     for (String s : fileReader.nextLine().split(",")) {
                         counter++;
                         keys.add(s);
@@ -95,6 +105,7 @@ public class GuiMethods {
                             counter = 0;
                         }
                     }
+                     */
                 }
                 Object[] options = {"Yes",
                         "Cancel"};

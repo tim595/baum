@@ -1,14 +1,8 @@
 package UI;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileFilter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class GuiElements {
     public static int showWelcomeDialogue(List<Integer> csvKeys) throws InterruptedException {
